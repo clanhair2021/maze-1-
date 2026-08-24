@@ -420,6 +420,8 @@ canvas.addEventListener('touchmove', (e) => {
         }
         checkRealtimeGoalTouch(pos.x, pos.y); 
     }
+    // 💡 指の最新位置に合わせてスポットライトを移動描画する
+    redrawAllHistory();
 });
 
 
