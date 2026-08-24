@@ -400,6 +400,14 @@ canvas.addEventListener('touchmove', (e) => {
         }
         checkRealtimeGoalTouch(pos.x, pos.y); 
     }
+    // 暗闇ハック中のライト位置更新
+    if (isHacked && hackType === 'darkness' && e.touches.length > 0) {
+        const containerRect = container.getBoundingClientRect();
+        const x = ((e.touches[0].clientX - containerRect.left) / containerRect.width) * 100;
+        const y = ((e.touches[0].clientY - containerRect.top) / containerRect.height) * 100;
+        container.style.setProperty('--touch-x', `${x}%`);
+        container.style.setProperty('--touch-y', `${y}%`);
+    }
 });
 
 
