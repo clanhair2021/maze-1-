@@ -40,6 +40,8 @@ let strokeHistory = []; let currentStroke = [];
 let judgeSystemType = 'color'; let savedRoute = [];
 let mazeStartPoint = null; let mazeGoalPoint = null; let setupStep = 'none';
 let currentStageNumber = 1;
+let isBlackout = false; // 👈 追記：暗転フラグ
+
 
 
 /* ==========================================
@@ -317,6 +319,15 @@ function redrawAllHistory() {
         ctx.lineCap = "round"; ctx.lineJoin = "round";
         for (let i = 1; i < stroke.length; i++) { ctx.lineTo(stroke[i].x, stroke[i].y); }
         ctx.stroke();
+    }
+    // --------------------------------------------------
+    // 💡 [ステップ1] 暗転（ブラックアウト）処理の追加
+    // --------------------------------------------------
+    if (!isAdminMode && isBlackout) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.98)'; // ほぼ真っ黒で画面を覆う
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
     }
 }
 
