@@ -703,3 +703,82 @@ function addNewStageAction(nextStageNumber) {
 function checkAnswerTrace() {
     stopMazeTimer(); alert("正解！おめでとうございます！"); resetCanvas(); goBackMenu();
 }
+/* ==========================================
+   🚨 ハック制御＆解析ミニゲーム処理
+   ========================================== */
+function triggerHackEffect() {
+    isHacked = true;
+    hackType = Math.random() < 0.5 ? 'darkness' : 'shrink';
+    
+    const repairBtn = document.getElementById('btn-hack-repair');
+    if (repairBtn) repairBtn.style.display = 'block';
+
+    if (hackType === 'darkness') {
+        container.classList.add('hack-darkness');
+    } else {
+        container.classList.add('hack-shrink');
+    }
+}
+
+function openRepairModal() {
+    document.getElementById('repair-modal').classList.add('open');
+    renderPuzzle();
+}
+
+function closeRepairModal() {
+    document.getElementById('repair-modal').classList.remove('open');
+}
+
+function scanText() {
+    const scanEl = document.getElementById('scan-target');
+    if (scanEl) {
+        scanEl.classList.add('scanned');
+        isScanned = true;
+    }
+}
+
+function renderPuzzle() {
+    const grid = document.getElementById('puzzle-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const labels = { 1: "30", 2: "倍", 3: "視界" };
+
+    puzzleState.forEach((val, idx) => {
+        const piece = document.createElement('div');
+        piece.className = 'puzzle-piece' + (val === targetPuzzleState[idx] ? ' correct' : '');
+        piece.innerText = labels[val];
+        piece.onclick = () => swapPiece(idx);
+        grid.appendChild(piece);
+    });
+
+    checkPuzzleClear();
+}
+
+function swapPiece(idx) {
+    if (!isScanned) {
+        alert("先に「スキャン実行」を行って解読してください！");
+        return;
+    }
+    const nextIdx = (idx + 1) % puzzleState.length;
+    [puzzleState[idx], puzzleState[nextIdx]] = [puzzleState[nextIdx], puzzleState[idx]];
+    renderPuzzle();
+}
+
+function checkPuzzleClear() {
+    const isCleared = puzzleState.every((val, idx) => val === targetPuzzleState[idx]);
+    if (isCleared && isHacked) {
+        setTimeout(() => {
+            alert("🎉 システム解析成功！障害を解除しました。");
+            clearHackEffect();
+            closeRepairModal();
+        }, 100);
+    }
+}
+
+function clearHackEffect() {
+    isHacked = false;
+    container.classList.remove('hack-darkness', 'hack-shrink');
+    const repairBtn = document.getElementById('btn-hack-repair');
+    if (repairBtn) repairBtn.style.display = 'none';
+}
