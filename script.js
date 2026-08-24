@@ -579,7 +579,7 @@ function startMazeTimer() {
     if (isMazeTimerRunning) return; 
     isMazeTimerRunning = true;
     mazeStartTime = Date.now(); 
-    }
+   
     mazeTimerInterval = setInterval(() => {
         const elapsedTime = Date.now() - mazeStartTime; 
         document.getElementById('timer-display').innerText = "TIME: " + formatMazeTime(elapsedTime);
