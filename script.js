@@ -694,3 +694,8 @@ function addNewStageAction(nextStageNumber) {
 function checkAnswerTrace() {
     stopMazeTimer(); alert("正解！おめでとうございます！"); resetCanvas(); goBackMenu();
 }
+// スマホ確認用：ボタンを押すたびに暗転を切り替える関数
+function testToggleBlackout() {
+    isBlackout = !isBlackout; // ON/OFFを切り替え
+    redrawAllHistory();
+}
