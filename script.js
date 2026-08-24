@@ -40,14 +40,6 @@ let strokeHistory = []; let currentStroke = [];
 let judgeSystemType = 'color'; let savedRoute = [];
 let mazeStartPoint = null; let mazeGoalPoint = null; let setupStep = 'none';
 let currentStageNumber = 1;
-/* ==========================================
-   🚨 ハック＆ミニゲーム状態管理
-   ========================================== */
-let isHacked = false;
-let hackType = null; // 'darkness' | 'shrink'
-let isScanned = false;
-let puzzleState = [3, 1, 2]; // 30倍パズルの初期並び（未完成状態）
-const targetPuzzleState = [1, 2, 3]; // 正解: [1(30), 2(倍), 3(パズル)]
 
 
 /* ==========================================
@@ -400,14 +392,6 @@ canvas.addEventListener('touchmove', (e) => {
         }
         checkRealtimeGoalTouch(pos.x, pos.y); 
     }
-    // 暗闇ハック中のライト位置更新
-    if (isHacked && hackType === 'darkness' && e.touches.length > 0) {
-        const containerRect = container.getBoundingClientRect();
-        const x = ((e.touches[0].clientX - containerRect.left) / containerRect.width) * 100;
-        const y = ((e.touches[0].clientY - containerRect.top) / containerRect.height) * 100;
-        container.style.setProperty('--touch-x', `${x}%`);
-        container.style.setProperty('--touch-y', `${y}%`);
-    }
 });
 
 
@@ -595,10 +579,6 @@ function startMazeTimer() {
     if (isMazeTimerRunning) return; 
     isMazeTimerRunning = true;
     mazeStartTime = Date.now(); 
-
-   // 🎲 30%の確率でハック障害発生
-    if (!isHacked && Math.random() < 0.3) {
-        triggerHackEffect();
     }
     mazeTimerInterval = setInterval(() => {
         const elapsedTime = Date.now() - mazeStartTime; 
@@ -702,83 +682,4 @@ function addNewStageAction(nextStageNumber) {
 
 function checkAnswerTrace() {
     stopMazeTimer(); alert("正解！おめでとうございます！"); resetCanvas(); goBackMenu();
-}
-/* ==========================================
-   🚨 ハック制御＆解析ミニゲーム処理
-   ========================================== */
-function triggerHackEffect() {
-    isHacked = true;
-    hackType = Math.random() < 0.5 ? 'darkness' : 'shrink';
-    
-    const repairBtn = document.getElementById('btn-hack-repair');
-    if (repairBtn) repairBtn.style.display = 'block';
-
-    if (hackType === 'darkness') {
-        container.classList.add('hack-darkness');
-    } else {
-        container.classList.add('hack-shrink');
-    }
-}
-
-function openRepairModal() {
-    document.getElementById('repair-modal').classList.add('open');
-    renderPuzzle();
-}
-
-function closeRepairModal() {
-    document.getElementById('repair-modal').classList.remove('open');
-}
-
-function scanText() {
-    const scanEl = document.getElementById('scan-target');
-    if (scanEl) {
-        scanEl.classList.add('scanned');
-        isScanned = true;
-    }
-}
-
-function renderPuzzle() {
-    const grid = document.getElementById('puzzle-grid');
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    const labels = { 1: "30", 2: "倍", 3: "視界" };
-
-    puzzleState.forEach((val, idx) => {
-        const piece = document.createElement('div');
-        piece.className = 'puzzle-piece' + (val === targetPuzzleState[idx] ? ' correct' : '');
-        piece.innerText = labels[val];
-        piece.onclick = () => swapPiece(idx);
-        grid.appendChild(piece);
-    });
-
-    checkPuzzleClear();
-}
-
-function swapPiece(idx) {
-    if (!isScanned) {
-        alert("先に「スキャン実行」を行って解読してください！");
-        return;
-    }
-    const nextIdx = (idx + 1) % puzzleState.length;
-    [puzzleState[idx], puzzleState[nextIdx]] = [puzzleState[nextIdx], puzzleState[idx]];
-    renderPuzzle();
-}
-
-function checkPuzzleClear() {
-    const isCleared = puzzleState.every((val, idx) => val === targetPuzzleState[idx]);
-    if (isCleared && isHacked) {
-        setTimeout(() => {
-            alert("🎉 システム解析成功！障害を解除しました。");
-            clearHackEffect();
-            closeRepairModal();
-        }, 100);
-    }
-}
-
-function clearHackEffect() {
-    isHacked = false;
-    container.classList.remove('hack-darkness', 'hack-shrink');
-    const repairBtn = document.getElementById('btn-hack-repair');
-    if (repairBtn) repairBtn.style.display = 'none';
 }
