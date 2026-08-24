@@ -41,6 +41,8 @@ let judgeSystemType = 'color'; let savedRoute = [];
 let mazeStartPoint = null; let mazeGoalPoint = null; let setupStep = 'none';
 let currentStageNumber = 1;
 let isBlackout = false; // 👈 追記：暗転フラグ
+let lightRadius = 150;      // スポットライトの半径（初期値）
+const maxRadius = 150;      // スポットライトの最大半径
 
 
 
