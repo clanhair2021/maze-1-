@@ -595,7 +595,11 @@ function startMazeTimer() {
     if (isMazeTimerRunning) return; 
     isMazeTimerRunning = true;
     mazeStartTime = Date.now(); 
-    
+
+   // 🎲 30%の確率でハック障害発生
+    if (!isHacked && Math.random() < 0.3) {
+        triggerHackEffect();
+    }
     mazeTimerInterval = setInterval(() => {
         const elapsedTime = Date.now() - mazeStartTime; 
         document.getElementById('timer-display').innerText = "TIME: " + formatMazeTime(elapsedTime);
