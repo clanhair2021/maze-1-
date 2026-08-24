@@ -40,6 +40,15 @@ let strokeHistory = []; let currentStroke = [];
 let judgeSystemType = 'color'; let savedRoute = [];
 let mazeStartPoint = null; let mazeGoalPoint = null; let setupStep = 'none';
 let currentStageNumber = 1;
+/* ==========================================
+   🚨 ハック＆ミニゲーム状態管理
+   ========================================== */
+let isHacked = false;
+let hackType = null; // 'darkness' | 'shrink'
+let isScanned = false;
+let puzzleState = [3, 1, 2]; // 30倍パズルの初期並び（未完成状態）
+const targetPuzzleState = [1, 2, 3]; // 正解: [1(30), 2(倍), 3(パズル)]
+
 
 /* ==========================================
    📦 プリセット（最初から入っている）ステージデータ
