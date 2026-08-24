@@ -323,12 +323,27 @@ function redrawAllHistory() {
         ctx.stroke();
     }
     // --------------------------------------------------
-    // 💡 [ステップ1] 暗転（ブラックアウト）処理の追加
+    // 💡 [ステップ2] スポットライト & 暗転描画処理
     // --------------------------------------------------
-    if (!isAdminMode && isBlackout) {
+    if (!isAdminMode) {
         ctx.save();
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.98)'; // ほぼ真っ黒で画面を覆う
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 完全消灯（isBlackout）でなければ、最後にタッチしている位置を丸く照らす
+        if (!isBlackout && currentStroke.length > 0) {
+            const lastPos = currentStroke[currentStroke.length - 1];
+            
+            ctx.globalCompositeOperation = 'destination-out'; // 重なった部分を透明に切り抜く
+            let grad = ctx.createRadialGradient(lastPos.x, lastPos.y, 10, lastPos.x, lastPos.y, lightRadius);
+            grad.addColorStop(0, 'rgba(0,0,0,1)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            
+            ctx.beginPath();
+            ctx.arc(lastPos.x, lastPos.y, lightRadius, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+        }
         ctx.restore();
     }
 }
