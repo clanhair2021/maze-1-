@@ -307,12 +307,13 @@ function resetCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); strok
 function redrawAllHistory() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     updateTransform();
-    
+   
+    // 1. 管理者モードのスタート/ゴール表示
     if (isAdminMode && adminSubMode === 'imageMode') {
         if (mazeStartPoint) { ctx.beginPath(); ctx.arc(mazeStartPoint.x, mazeStartPoint.y, 10, 0, Math.PI*2); ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fill(); }
         if (mazeGoalPoint) { ctx.beginPath(); ctx.arc(mazeGoalPoint.x, mazeGoalPoint.y, 10, 0, Math.PI*2); ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fill(); }
     }
-
+    // 2. 過去に描いた線を描画
     for (let stroke of strokeHistory) {
         if (stroke.length === 0) continue;
         ctx.beginPath(); ctx.moveTo(stroke[0].x, stroke[0].y);
@@ -322,19 +323,33 @@ function redrawAllHistory() {
         for (let i = 1; i < stroke.length; i++) { ctx.lineTo(stroke[i].x, stroke[i].y); }
         ctx.stroke();
     }
-    // --------------------------------------------------
-    // 💡 [ステップ2] スポットライト & 暗転描画処理
-    // --------------------------------------------------
+
+    // 3. 現在描いている途中の線を描画
+    if (isDrawing && currentStroke.length > 0) {
+        ctx.beginPath(); ctx.moveTo(currentStroke[0].x, currentStroke[0].y);
+        ctx.lineWidth = CONFIG.strokeWidth / scale;
+        ctx.strokeStyle = isAdminMode ? CONFIG.adminStrokeColor : CONFIG.userStrokeColor;
+        ctx.lineCap = "round"; ctx.lineJoin = "round";
+        for (let i = 1; i < currentStroke.length; i++) { ctx.lineTo(currentStroke[i].i, currentStroke[i].y); }
+        for (let i = 1; i < currentStroke.length; i++) { ctx.lineTo(currentStroke[i].x, currentStroke[i].y); }
+        ctx.stroke();
+    }
+    // 4. スポットライト & 暗転（黒い覆い）を描画
     if (!isAdminMode) {
         ctx.save();
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 完全消灯（isBlackout）でなければ、最後にタッチしている位置を丸く照らす
-        if (!isBlackout && currentStroke.length > 0) {
+        if (isBlackout) {
+            // 完全消灯時：全体を真っ黒にする
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.98)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        } else if (currentStroke.length > 0) {
+            // スポットライト表示時：画面全体を暗くしたあと、指の先端だけくり抜く
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
             const lastPos = currentStroke[currentStroke.length - 1];
             
-            ctx.globalCompositeOperation = 'destination-out'; // 重なった部分を透明に切り抜く
+            ctx.globalCompositeOperation = 'destination-out'; // 重なった部分（円）を透過させる
             let grad = ctx.createRadialGradient(lastPos.x, lastPos.y, 10, lastPos.x, lastPos.y, lightRadius);
             grad.addColorStop(0, 'rgba(0,0,0,1)');
             grad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -344,6 +359,7 @@ function redrawAllHistory() {
             ctx.fillStyle = grad;
             ctx.fill();
         }
+
         ctx.restore();
     }
 }
