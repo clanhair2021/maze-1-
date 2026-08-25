@@ -426,14 +426,8 @@ canvas.addEventListener('touchmove', (e) => {
     }
     const pos = getTouchPos(e); 
     currentStroke.push(pos); 
-    ctx.lineTo(pos.x, pos.y); 
-    ctx.stroke();
-
     // ⭕️ ゴール判定の前に今描いている線を履歴に保存（ゴールに達したらそのまま描き終わりにさせる）
     if (!isAdminMode) { 
-        if (strokeHistory.indexOf(currentStroke) === -1) {
-            strokeHistory.push(currentStroke);
-        }
         checkRealtimeGoalTouch(pos.x, pos.y); 
     }
     // 💡 指の最新位置に合わせてスポットライトを移動描画する
