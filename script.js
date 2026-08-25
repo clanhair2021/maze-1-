@@ -315,7 +315,7 @@ function redrawAllHistory() {
         if (mazeGoalPoint) { ctx.beginPath(); ctx.arc(mazeGoalPoint.x, mazeGoalPoint.y, 10, 0, Math.PI*2); ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fill(); }
     }
 
-    // 3. 過去に描いた線を描画（※ここでは一切消えません）
+    // 3. 過去に描いた線を描画
     for (let stroke of strokeHistory) {
         if (stroke.length === 0) continue;
         ctx.beginPath(); ctx.moveTo(stroke[0].x, stroke[0].y);
@@ -336,31 +336,36 @@ function redrawAllHistory() {
         ctx.stroke();
     }
 
-    // 5. 暗転・スポットライト処理（独立したレイヤーとして一番上に重ねる）
+    // 5. 暗転・スポットライト処理
     if (!isAdminMode && isHackModeEnabled) {
-        // メモリ上に一時的な「暗幕用キャンバス」を作成
+        // メモリ上に暗幕用のキャンバスを作成
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
         const tempCtx = tempCanvas.getContext('2d');
 
-        if (isBlackout) {
-            // 完全暗転：真っ黒な幕を作成
-            tempCtx.fillStyle = 'rgba(0, 0, 0, 0.98)';
-            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-        } else if (currentStroke.length > 0) {
-            // スポットライト：暗幕を張ってから、その暗幕だけを穴あけ（くり抜き）
-            tempCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
-            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        // メインキャンバスと同じズーム・移動の状態をセット
+        tempCtx.setTransform(scale, 0, 0, scale, panX, panY);
 
+        if (isBlackout) {
+            // 完全暗転時：画面全体を覆う十分な大きさの黒枠を描画
+            tempCtx.fillStyle = 'rgba(0, 0, 0, 0.98)';
+            // 拡大縮小されても画面全体が埋まるように広めに塗りつぶす
+            tempCtx.fillRect(-panX/scale, -panY/scale, canvas.width/scale, canvas.height/scale);
+        } else if (currentStroke.length > 0) {
+            // 暗幕を画面全体に張る
+            tempCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+            tempCtx.fillRect(-panX/scale, -panY/scale, canvas.width/scale, canvas.height/scale);
+
+            // 指の先端の位置をくり抜く
             const lastPos = currentStroke[currentStroke.length - 1];
             
             tempCtx.globalCompositeOperation = 'destination-out';
             let grad = tempCtx.createRadialGradient(lastPos.x, lastPos.y, 10, lastPos.x, lastPos.y, lightRadius);
-            grad.addColorStop(0, 'rgba(0,0,0,1)'); // 完全透明
-            grad.addColorStop(0.7, 'rgba(0,0,0,0.8)');
-            grad.addColorStop(1, 'rgba(0,0,0,0)');  // 端はくっきり影
-            
+            grad.addColorStop(0, 'rgba(0,0,0,1)');   // スポットライトの中心（完全透明）
+            grad.addColorStop(0.8, 'rgba(0,0,0,0.8)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');   // 端は影
+
             tempCtx.beginPath();
             tempCtx.arc(lastPos.x, lastPos.y, lightRadius, 0, Math.PI * 2);
             tempCtx.fillStyle = grad;
@@ -368,9 +373,13 @@ function redrawAllHistory() {
         }
 
         // くり抜いた暗幕をメインキャンバスの「一番上」に描画
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // 1:1の等倍に戻して重ね合わせる
         ctx.drawImage(tempCanvas, 0, 0);
+        ctx.restore();
     }
 }
+
 
 
 function undoLastLine() { 
