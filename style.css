@@ -1,0 +1,10 @@
+/* ==========================================
+   🌐 CSSモジュールインポート
+   ========================================== */
+@import url('base.css');
+@import url('menu.css');
+@import url('game.css');
+@import url('admin.css');
+@import url('hack.css');
+@import url('patch.css');
+
