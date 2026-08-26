@@ -766,15 +766,6 @@ function checkAnswerTrace() {
     goBackMenu();
 }
 
-// スマホ確認用：ボタンを押すたびに暗転を切り替える関数
-function testToggleBlackout() {
-    if (isBlackout) {
-        resolveHackEvent();
-    } else {
-        triggerHackEvent();
-    }
-}
-
 /* ==========================================
    🚨 リアルプログラムパッチ・攻防ミニゲーム用変数・関数
    ========================================== */
