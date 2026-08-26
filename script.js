@@ -298,13 +298,21 @@ function openAdmin(mode) {
 
 function goBackMenu() { 
     stopMazeTimer(); 
+    stopHackLoop(); // 👈 追記：ハックタイマーと暗転を完全リセット
     document.getElementById('timer-display').innerText = "TIME: 00:00.00"; 
     gamePage.classList.remove('active'); 
     menuPage.classList.add('active'); 
     refreshStageMenu();
 }
 
-function resetCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); strokeHistory = []; currentStroke = []; hasJudged = false; redrawAllHistory(); }
+function resetCanvas() { 
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    strokeHistory = []; 
+    currentStroke = [];
+    hasJudged = false; 
+    stopHackLoop(); // 👈 追記：ハックタイマーと暗転を完全リセット
+    redrawAllHistory(); 
+}
 
 /* ==========================================
    描画・タッチイベント処理
