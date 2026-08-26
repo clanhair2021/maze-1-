@@ -41,6 +41,9 @@ let judgeSystemType = 'color'; let savedRoute = [];
 let mazeStartPoint = null; let mazeGoalPoint = null; let setupStep = 'none';
 let currentStageNumber = 1;
 let isBlackout = false; // 👈 追記：暗転フラグ
+let hackTimer = null;         // ハック発生タイマー
+let isHacked = false;         // ハック中（暗転障害発生中）かどうか
+const HACK_INTERVAL = 8000;   // ハックが発生する間隔（例：8秒ごと）
 let lightRadius = 150;      // スポットライトの半径（初期値）
 const maxRadius = 150;      // スポットライトの最大半径
 let isHackModeEnabled = true; // 👈 追記：ハックモード（暗転・スポットライト）のON/OFF
@@ -644,12 +647,20 @@ function startMazeTimer() {
         const elapsedTime = Date.now() - mazeStartTime; 
         document.getElementById('timer-display').innerText = "TIME: " + formatMazeTime(elapsedTime);
     }, 10);
+
+    // 迷路タイマー開始時にハックループもスタート
+    startHackLoop();
+
 }
 
 function stopMazeTimer() {
     if (!isMazeTimerRunning) return;
     isMazeTimerRunning = false;
     clearInterval(mazeTimerInterval); 
+
+    // ゲーム終了やリセット時にハックループを停止
+    stopHackLoop();
+
 }
 
 function formatMazeTime(ms) {
@@ -748,3 +759,69 @@ function testToggleBlackout() {
     isBlackout = !isBlackout; // ON/OFFを切り替え
     redrawAllHistory();
 }
+// 🚨 ハック（障害）発生関数
+function triggerHackEvent() {
+    if (isAdminMode || !isHackModeEnabled || hasJudged || !isMazeTimerRunning) return;
+
+    isHacked = true;
+    isBlackout = true; // 完全暗転
+    redrawAllHistory();
+
+    // 画面にハック発生警告を表示（簡易アラート）
+    showHackWarning();
+
+    // 例：3秒後に自動復旧する場合（※後でミニゲーム成功時に変更可能）
+    setTimeout(() => {
+        resolveHackEvent();
+    }, 3000);
+}
+
+// 画面に「WARNING / SYSTEM HACKED」のアラートを一時表示する
+function showHackWarning() {
+    let alertEl = document.getElementById('hack-alert');
+    if (!alertEl) {
+        alertEl = document.createElement('div');
+        alertEl.id = 'hack-alert';
+        alertEl.style.cssText = `
+            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.85); color: white; padding: 15px 25px;
+            font-size: 20px; font-weight: bold; border-radius: 8px; z-index: 10000;
+            box-shadow: 0 0 15px red; text-align: center; pointer-events: none;
+            animation: blink 0.5s infinite alternate;
+        `;
+        document.getElementById('game-page').appendChild(alertEl);
+    }
+    alertEl.innerHTML = "⚠️ WARNING ⚠️<br>SYSTEM HACKED!!";
+    alertEl.style.display = 'block';
+
+    setTimeout(() => {
+        if (alertEl) alertEl.style.display = 'none';
+    }, 1500);
+}
+
+// ✅ ハック復旧（暗転解除）関数
+function resolveHackEvent() {
+    isHacked = false;
+    isBlackout = false;
+    redrawAllHistory();
+}
+
+// ⏱️ ハック発生タイマーの開始・停止
+function startHackLoop() {
+    stopHackLoop();
+    // 8秒ごとにハックイベントが発生
+    hackTimer = setInterval(() => {
+        if (!isHacked && isMazeTimerRunning) {
+            triggerHackEvent();
+        }
+    }, HACK_INTERVAL);
+}
+
+function stopHackLoop() {
+    if (hackTimer) {
+        clearInterval(hackTimer);
+        hackTimer = null;
+    }
+    resolveHackEvent();
+}
+
