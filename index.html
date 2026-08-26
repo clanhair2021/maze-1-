@@ -35,16 +35,50 @@
 
     <!-- 2. ゲーム・登録共通画面 -->
     <div id="game-page" class="page">
-        <!-- 💡 ハック解除用ミニゲーム画面（暗転時に表示） -->
-        <div id="minigame-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999999; flex-direction: column; justify-content: center; align-items: center; color: #00ffcc; font-family: sans-serif;">
-            <h2 style="font-size: 22px; margin-bottom: 10px; text-shadow: 0 0 8px #00ffcc;">⚠️ SYSTEM HACKED ⚠️</h2>
-            <p style="font-size: 14px; margin-bottom: 20px; color: #fff;">画面を連打してシステムを復旧せよ！</p>
-            
-            <!-- 連打ボタン -->
-            <button id="minigame-btn" onclick="onMinigameTap()" style="padding: 15px 30px; font-size: 18px; font-weight: bold; background: #00ffcc; color: #000; border: none; border-radius: 30px; box-shadow: 0 0 15px #00ffcc; cursor: pointer;">
-                RECOVER (<span id="minigame-count">5</span>)
-            </button>
-        </div>
+        <!-- 💡 ハック解除用：コード解析・パッチ適用ミニゲーム画面 -->
+        <div id="minigame-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); z-index: 999999; color: #fff; padding: 20px; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; font-family: monospace;">
+    
+            <!-- 埋め込みスタイル（ミニゲーム専用） -->
+            <style>
+                #minigame-overlay .box { border: 2px solid #fff; padding: 20px; max-width: 620px; width: 100%; background: #111; text-align: left; position: relative; overflow: hidden; box-sizing: border-box; }
+                #minigame-overlay h2 { font-size: 15px; margin: 0 0 6px 0; color: #ff5555; text-align: center; }
+                #minigame-overlay p { font-size: 11px; margin: 0 0 8px 0; color: #ccc; text-align: center; }
+                #minigame-overlay #timer-display-patch { font-size: 15px; color: #ffcc00; text-align: center; font-weight: bold; margin-bottom: 10px; }
+                #minigame-overlay .code-container { max-height: 340px; overflow-y: auto; border: 1px solid #444; padding: 12px; background: #0a0a0a; font-size: 11px; line-height: 1.8; color: #aaa; position: relative; }
+                #minigame-overlay .code-line { margin: 2px 0; white-space: pre; }
+                #minigame-overlay .comment { color: #6a9955; }
+                #minigame-overlay .keyword { color: #569cd6; }
+                #minigame-overlay .var-name { color: #9cdcfe; }
+                #minigame-overlay .locked { color: #ff6666; font-style: italic; }
+                #minigame-overlay .val { color: #b5cea8; }
+                #minigame-overlay .ruby-text { display: inline-block; font-size: 10px; color: #ffd700; background: rgba(255, 215, 0, 0.15); padding: 0 4px; margin-left: 6px; border-left: 2px solid #ffd700; }
+                #minigame-overlay .fake-code { color: #ff00ff; font-weight: bold; background: rgba(255,0,255,0.15); padding: 4px; margin: 6px 0; display: flex; align-items: center; } 
+                #minigame-overlay .fake-code label { margin-left: 6px; color: #fff; cursor: pointer; }
+                #minigame-overlay .fix-select { background: #222; color: #00ff00; border: 1px solid #00ff00; font-size: 11px; padding: 2px 4px; font-family: monospace; font-weight: bold; }
+                #minigame-overlay .action-btn-group { display: flex; gap: 8px; margin-top: 12px; }
+                #minigame-overlay .scan-btn { background: #00aaff; color: #000; border: 2px solid #00aaff; padding: 10px; font-size: 12px; font-weight: bold; cursor: pointer; flex: 1; text-align: center; }
+                #minigame-overlay .minigame-btn { background: #fff; color: #000; border: 2px solid #fff; padding: 10px; font-size: 12px; font-weight: bold; cursor: pointer; flex: 1.5; text-align: center; }
+                #minigame-overlay .noise-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.3) 3px, transparent 3px, transparent 6px); pointer-events: none; animation: glitch 0.15s infinite; display: none; z-index: 5; }
+                @keyframes glitch { 0% { opacity: 0.9; transform: translateY(0); } 50% { opacity: 0.4; transform: translateY(-2px); } 100% { opacity: 1.0; transform: translateY(2px); } }
+           </style>
+
+           <div class="box">
+               <div id="glitch-noise" class="noise-overlay"></div>
+               <h2 id="hack-title">🔒 LIVE PROGRAM PATCH</h2>
+               <p id="hack-desc">コードを分析・修正してシステムを正常化してください</p>
+               <div id="timer-display-patch">残り時間: 45.0秒</div>
+        
+               <div class="code-container" id="code-box">
+                   <!-- JavaScriptで動的に描画されます -->
+               </div>
+
+               <div class="action-btn-group">
+                   <button class="scan-btn" onclick="runCodeScan()">🔍 スキャン (SCAN)</button>
+                   <button class="minigame-btn" onclick="executeLivePatch()">▶ 修正実行 (EXECUTE)</button>
+               </div>
+           </div>
+       </div>
+
 
        <div id="timer-display">TIME: 00:00.00</div>
         <!-- テスト用ボタン（スマホ動作確認用） -->
