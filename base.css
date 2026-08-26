@@ -1,0 +1,71 @@
+/* ==========================================================================
+   美容室CLan 迷路ゲーム - base.css
+   【役割】テーマカラー・フォント・全体リセット・ボタン共通スタイルの定義
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. テーマカラー & 共通変数設定 (:root)
+   -------------------------------------------------------------------------- */
+:root {
+    /* フォント定義 */
+    --font-jp: 'CLanCustomFont', sans-serif;                /* 日本語ドット絵 */
+    --font-pixel-en: 'Press Start 2P', 'VT323', monospace;   /* レトロ英数字 */
+    --font-digital: 'Orbitron', monospace;                   /* スタイリッシュ数字・タイマー */
+
+    /* メインテーマカラー */
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --border-style: 2px solid #000000;
+  
+    /* サイバー・ハック演出用カラー */
+    --color-primary: #00ffcc;       /* サイバーグリーン */
+    --color-secondary: #ff0055;     /* サイバーピンク */
+    --color-accent: #ffd700;        /* ハイライト（ゴールド） */
+}
+/* --------------------------------------------------------------------------
+   2. ローカルフォント（ドット絵日本語）読み込み
+   -------------------------------------------------------------------------- */
+@font-face {
+    font-family: 'CLanCustomFont';
+    src: url('Nosutaru-dotMPlusH-10-Regular.ttf') format('truetype');
+    font-display: swap;
+}
+/* --------------------------------------------------------------------------
+   3. 全体リセット & 共通スタイル
+   -------------------------------------------------------------------------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'CLanCustomFont', sans-serif;
+    border-radius: 0 !important; /* すべて角丸なし */
+}
+
+body { 
+    background: var(--bg-color); 
+    color: var(--text-color); 
+    overflow: hidden; /* 画面全体のスクロールを防止してブレを防ぐ */
+    text-align: center;
+}
+
+/* ページ切り替え用基本クラス */
+.page { display: none; }
+.page.active { display: block; }
+
+/* --------------------------------------------------------------------------
+   4. ボタン共通デザイン
+   -------------------------------------------------------------------------- */
+button { 
+    padding: 10px 20px; 
+    font-size: 14px; 
+    border: var(--border-style); 
+    background: #ffffff; 
+    color: #000000; 
+    cursor: pointer; 
+    font-weight: bold;
+    transition: background-color 0.1s ease, color 0.1s ease;
+}
+button:hover {
+    background: #000000;
+    color: #ffffff;
+}
