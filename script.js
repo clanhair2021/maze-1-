@@ -768,7 +768,7 @@ function testToggleBlackout() {
     redrawAllHistory();
 let minigameTapCount = 0;
 const REQUIRED_TAPS = 5; // 復旧に必要な連打回数
-
+}
 // 🚨 ハック（障害）発生関数（連打ミニゲーム起動）
 function triggerHackEvent() {
     if (isAdminMode || !isHackModeEnabled || hasJudged || !isMazeTimerRunning) return;
