@@ -336,49 +336,49 @@ function redrawAllHistory() {
         ctx.stroke();
     }
 
-    // 5. 暗転・スポットライト処理
+    // 5. 暗転・スポットライト処理（画面座標系で一括描画）
     if (!isAdminMode && isHackModeEnabled) {
-        // メモリ上に暗幕用のキャンバスを作成
+        // メモリ上に暗幕用のキャンバスを作成（等倍サイズ）
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
         const tempCtx = tempCanvas.getContext('2d');
 
-        // メインキャンバスと同じズーム・移動の状態をセット
-        tempCtx.setTransform(scale, 0, 0, scale, panX, panY);
-
         if (isBlackout) {
-            // 完全暗転時：画面全体を覆う十分な大きさの黒枠を描画
+            // 完全暗転時：画面全体（0, 0 から 幅・高さ）を真っ黒に塗る
             tempCtx.fillStyle = 'rgba(0, 0, 0, 0.98)';
-            // 拡大縮小されても画面全体が埋まるように広めに塗りつぶす
-            tempCtx.fillRect(-panX/scale, -panY/scale, canvas.width/scale, canvas.height/scale);
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
         } else if (currentStroke.length > 0) {
-            // 暗幕を画面全体に張る
+            // スポットライト時：画面全体を暗くする
             tempCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
-            tempCtx.fillRect(-panX/scale, -panY/scale, canvas.width/scale, canvas.height/scale);
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-            // 指の先端の位置をくり抜く
+            // 指の最新座標を「拡大・移動後の画面上の位置」に変換
             const lastPos = currentStroke[currentStroke.length - 1];
-            
+            const screenX = lastPos.x * scale + panX;
+            const screenY = lastPos.y * scale + panY;
+            const screenRadius = lightRadius * scale; // 拡大率に合わせたスポットライト半径
+
             tempCtx.globalCompositeOperation = 'destination-out';
-            let grad = tempCtx.createRadialGradient(lastPos.x, lastPos.y, 10, lastPos.x, lastPos.y, lightRadius);
-            grad.addColorStop(0, 'rgba(0,0,0,1)');   // スポットライトの中心（完全透明）
+            let grad = tempCtx.createRadialGradient(screenX, screenY, 10 * scale, screenX, screenY, screenRadius);
+            grad.addColorStop(0, 'rgba(0,0,0,1)');   // スポットライトの中心（穴あけ）
             grad.addColorStop(0.8, 'rgba(0,0,0,0.8)');
-            grad.addColorStop(1, 'rgba(0,0,0,0)');   // 端は影
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
 
             tempCtx.beginPath();
-            tempCtx.arc(lastPos.x, lastPos.y, lightRadius, 0, Math.PI * 2);
+            tempCtx.arc(screenX, screenY, screenRadius, 0, Math.PI * 2);
             tempCtx.fillStyle = grad;
             tempCtx.fill();
         }
 
-        // くり抜いた暗幕をメインキャンバスの「一番上」に描画
+        // くり抜いた暗幕をメインキャンバスの上に重ねる（変換行列を一時リセット）
         ctx.save();
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // 1:1の等倍に戻して重ね合わせる
+        ctx.setTransform(1, 0, 0, 1, 0, 0); 
         ctx.drawImage(tempCanvas, 0, 0);
         ctx.restore();
     }
 }
+
 
 
 
