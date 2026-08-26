@@ -783,7 +783,7 @@ function triggerHackEvent() {
     const countEl = document.getElementById('minigame-count');
     if (overlay && countEl) {
         countEl.innerText = minigameTapCount;
-        overlay.style.display = 'flex';
+        overlay.style.setProperty('display', 'flex', 'important');
     }
 }
 
