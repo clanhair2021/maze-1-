@@ -760,61 +760,206 @@ function addNewStageAction(nextStageNumber) {
 }
 
 function checkAnswerTrace() {
-    stopMazeTimer(); alert("正解！おめでとうございます！"); resetCanvas(); goBackMenu();
+    stopMazeTimer(); 
+    alert("正解！おめでとうございます！"); 
+    resetCanvas(); 
+    goBackMenu();
 }
+
 // スマホ確認用：ボタンを押すたびに暗転を切り替える関数
 function testToggleBlackout() {
-    isBlackout = !isBlackout; // ON/OFFを切り替え
-    redrawAllHistory();
+    if (isBlackout) {
+        resolveHackEvent();
+    } else {
+        triggerHackEvent();
+    }
 }
-let minigameTapCount = 0;
-const REQUIRED_TAPS = 5; // 復旧に必要な連打回数
 
-// 🚨 ハック（障害）発生関数（連打ミニゲーム起動）
+/* ==========================================
+   🚨 リアルプログラムパッチ・攻防ミニゲーム用変数・関数
+   ========================================== */
+let patchTimeLeft = 45.0;
+let patchTimerInterval = null;
+let hasNoiseInCurrentSession = false;
+let isScanned = false;
+let targetCalcValue = 6;
+
+// 🚨 ハック（障害）発生関数（パッチ適用ミニゲーム起動）
 function triggerHackEvent() {
     if (isAdminMode || !isHackModeEnabled || hasJudged || !isMazeTimerRunning) return;
 
     isHacked = true;
-    isBlackout = true; // 完全暗転
-    minigameTapCount = REQUIRED_TAPS; // カウントを5にリセット
+    isBlackout = true; // 迷路画面を完全暗転
     redrawAllHistory();
 
-    // 連打用オーバーレイ画面を表示＆カウントセット
+    // ミニゲーム画面を開く
+    openPatchMinigame();
+}
+
+// 🔓 パッチ適用ミニゲーム画面の初期化＆表示
+function openPatchMinigame() {
+    isScanned = false;
+    
     const overlay = document.getElementById('minigame-overlay');
-    const countEl = document.getElementById('minigame-count');
-    if (overlay && countEl) {
-        countEl.innerText = minigameTapCount;
+    if (overlay) {
         overlay.style.setProperty('display', 'flex', 'important');
     }
+
+    // ノイズ（バグ）の発生判定（60%の確率）
+    hasNoiseInCurrentSession = Math.random() < 0.6;
+    const glitchEl = document.getElementById('glitch-noise');
+    if (glitchEl) {
+        glitchEl.style.display = hasNoiseInCurrentSession ? 'block' : 'none';
+    }
+
+    // 目標となる計算値をランダム決定 (4, 6, 8)
+    targetCalcValue = [4, 6, 8][Math.floor(Math.random() * 3)];
+
+    // コードUIの描画
+    renderCodeUI();
+
+    // 制限時間タイマー（45.0秒カウントダウン）
+    patchTimeLeft = 45.0;
+    const timerEl = document.getElementById('timer-display-patch');
+    if (timerEl) {
+        timerEl.innerText = `残り時間: ${patchTimeLeft.toFixed(1)}秒`;
+    }
+    
+    clearInterval(patchTimerInterval);
+    patchTimerInterval = setInterval(() => {
+        patchTimeLeft -= 0.1;
+        if (timerEl) {
+            timerEl.innerText = `残り時間: ${Math.max(0, patchTimeLeft).toFixed(1)}秒`;
+        }
+        
+        if (patchTimeLeft <= 0) {
+            clearInterval(patchTimerInterval);
+            alert("【TIME OVER】パッチ適用失敗！システムが復旧できませんでした。");
+            // 失敗時は再挑戦のためにUIを再リセットして展開
+            openPatchMinigame();
+        }
+    }, 100);
 }
 
-// 👆 ミニゲーム用ボタンがタップされた時の処理
-function onMinigameTap() {
-    if (!isHacked) return;
+// 💻 コード解析画面の動的描画
+function renderCodeUI() {
+    const codeBox = document.getElementById('code-box');
+    if (!codeBox) return;
 
-    minigameTapCount--;
-    const countEl = document.getElementById('minigame-count');
-    if (countEl) countEl.innerText = minigameTapCount;
+    let activeHackScript = `<span class="var-name">isBlackout</span> = <span class="keyword">true</span>;`;
 
-    // 5回連打完了したら暗転解除！
-    if (minigameTapCount <= 0) {
+    let commentHeader = isScanned ? 
+        `<div class="code-line comment">// ⛔ 実行中のウイルス障害</div>` : 
+        `<div class="code-line comment">// --- INTRUSION DETECTED ---</div>`;
+
+    let fakeCodeHtml = '';
+    if (hasNoiseInCurrentSession) {
+        if (isScanned) {
+            fakeCodeHtml = `
+                <div class="code-line fake-code">
+                    <input type="checkbox" id="fake-code-active" checked>
+                    <label for="fake-code-active">⚠️ 侵入バグ: systemErrorCrash();</label>
+                    <span class="ruby-text">← チェックを外して無効化せよ</span>
+                </div>`;
+        } else {
+            fakeCodeHtml = `
+                <div class="code-line fake-code">
+                    <input type="checkbox" id="fake-code-active" checked>
+                    <label for="fake-code-active">systemErrorCrash();</label>
+                </div>`;
+        }
+    }
+
+    let patchComment = isScanned ?
+        `<div class="code-line comment">// 🛠️ 修復用パッチコード (指示通りに書き換えよ)</div>` :
+        `<div class="code-line comment">// --- SYSTEM REPAIR MODULE ---</div>`;
+
+    const multiplyOp = isScanned ? '×' : '*';
+
+    const rBlackout = isScanned ? '<span class="ruby-text">← 画面消灯 (falseで解除)</span>' : '';
+    const rValA = isScanned ? '<span class="ruby-text">← 回復計算値A</span>' : '';
+    const rValB = isScanned ? '<span class="ruby-text">← 回復計算値B</span>' : '';
+    const rCalc = isScanned ? `<span class="ruby-text">← (valA + valB) を ${targetCalcValue} にせよ</span>` : '';
+
+    codeBox.innerHTML = `
+        ${commentHeader}
+        <div class="code-line locked"><span class="keyword">function</span> <span class="var-name">applyMalware</span>() {</div>
+        <div class="code-line locked">    ${activeHackScript}</div>
+        <div class="code-line locked">}</div>
+        
+        ${fakeCodeHtml}
+
+        <div class="code-line"></div>
+        ${patchComment}
+        <div class="code-line"><span class="keyword">function</span> <span class="var-name">applySystemPatch</span>() {</div>
+        <div class="code-line">    <span class="var-name">isBlackout</span> = <select id="patch-blackout" class="fix-select">
+                <option value="true">true</option>
+                <option value="false">false</option>
+            </select>; ${rBlackout}</div>
+        <div class="code-line">    <span class="keyword">let</span> <span class="var-name">valA</span> = <select id="calc-a" class="fix-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>; ${rValA}</div>
+        <div class="code-line">    <span class="keyword">let</span> <span class="var-name">valB</span> = <select id="calc-b" class="fix-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>; ${rValB}</div>
+        <div class="code-line">    <span class="var-name">systemStatus</span> = (<span class="var-name">valA</span> + <span class="var-name">valB</span>) ${multiplyOp} <span class="val">20</span>; ${rCalc}</div>
+        <div class="code-line">}</div>
+    `;
+}
+
+// 🔍 スキャンボタン実行
+function runCodeScan() {
+    isScanned = true;
+    renderCodeUI();
+    alert("【SCAN COMPLETE】コードの解析が完了しました。各プログラム要素の解説ルビを表示します。");
+}
+
+// ▶ 修正実行ボタン実行
+function executeLivePatch() {
+    if (hasNoiseInCurrentSession) {
+        const fakeCheck = document.getElementById('fake-code-active');
+        if (fakeCheck && fakeCheck.checked) {
+            alert("【RUNTIME ERROR】Uncaught ReferenceError: systemErrorCrash is not defined\n余計なコードが実行を妨害しています！スキャンしてバグ行を除外（チェック解除）してください。");
+            return;
+        }
+    }
+
+    const selectedBlackout = document.getElementById('patch-blackout').value === 'true';
+    const valA = parseInt(document.getElementById('calc-a').value, 10);
+    const valB = parseInt(document.getElementById('calc-b').value, 10);
+    const calcSum = valA + valB;
+
+    // パッチ成功条件：isBlackout を false にし、計算値を目標値に合わせる
+    if (!selectedBlackout && calcSum === targetCalcValue) {
+        alert("【SUCCESS】パッチが正常適用されました！システムが復旧します。");
         resolveHackEvent();
+    } else {
+        alert("【PATCH FAILED】パッチの検証に失敗しました！\nスキャン（SCAN）を実行して指示通りにコードを設定してください。");
     }
 }
 
-// ✅ ハック復旧（暗転解除）関数
+// ✅ ハック復旧（暗転解除＆ミニゲーム終了）
 function resolveHackEvent() {
+    clearInterval(patchTimerInterval);
     isHacked = false;
     isBlackout = false;
     
-    // 連打画面を非表示にする
+    // ミニゲーム画面を閉じる
     const overlay = document.getElementById('minigame-overlay');
-    if (overlay) overlay.style.display = 'none';
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
 
     redrawAllHistory();
 }
 
-// ⏱️ ハック発生タイマーの開始・停止（※ここは元のままでOKです）
+// ⏱️ ハック発生タイマーの開始・停止
 function startHackLoop() {
     stopHackLoop();
     hackTimer = setInterval(() => {
