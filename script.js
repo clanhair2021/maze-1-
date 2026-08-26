@@ -766,58 +766,56 @@ function checkAnswerTrace() {
 function testToggleBlackout() {
     isBlackout = !isBlackout; // ON/OFFを切り替え
     redrawAllHistory();
-}
-// 🚨 ハック（障害）発生関数
+let minigameTapCount = 0;
+const REQUIRED_TAPS = 5; // 復旧に必要な連打回数
+
+// 🚨 ハック（障害）発生関数（連打ミニゲーム起動）
 function triggerHackEvent() {
     if (isAdminMode || !isHackModeEnabled || hasJudged || !isMazeTimerRunning) return;
 
     isHacked = true;
     isBlackout = true; // 完全暗転
+    minigameTapCount = REQUIRED_TAPS; // カウントを5にリセット
     redrawAllHistory();
 
-    // 画面にハック発生警告を表示（簡易アラート）
-    showHackWarning();
-
-    // 例：3秒後に自動復旧する場合（※後でミニゲーム成功時に変更可能）
-    setTimeout(() => {
-        resolveHackEvent();
-    }, 3000);
+    // 連打用オーバーレイ画面を表示＆カウントセット
+    const overlay = document.getElementById('minigame-overlay');
+    const countEl = document.getElementById('minigame-count');
+    if (overlay && countEl) {
+        countEl.innerText = minigameTapCount;
+        overlay.style.display = 'flex';
+    }
 }
 
-// 画面に「WARNING / SYSTEM HACKED」のアラートを一時表示する
-function showHackWarning() {
-    let alertEl = document.getElementById('hack-alert');
-    if (!alertEl) {
-        alertEl = document.createElement('div');
-        alertEl.id = 'hack-alert';
-        alertEl.style.cssText = `
-            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(255, 0, 0, 0.85); color: white; padding: 15px 25px;
-            font-size: 20px; font-weight: bold; border-radius: 8px; z-index: 10000;
-            box-shadow: 0 0 15px red; text-align: center; pointer-events: none;
-            animation: blink 0.5s infinite alternate;
-        `;
-        document.getElementById('game-page').appendChild(alertEl);
-    }
-    alertEl.innerHTML = "⚠️ WARNING ⚠️<br>SYSTEM HACKED!!";
-    alertEl.style.display = 'block';
+// 👆 ミニゲーム用ボタンがタップされた時の処理
+function onMinigameTap() {
+    if (!isHacked) return;
 
-    setTimeout(() => {
-        if (alertEl) alertEl.style.display = 'none';
-    }, 1500);
+    minigameTapCount--;
+    const countEl = document.getElementById('minigame-count');
+    if (countEl) countEl.innerText = minigameTapCount;
+
+    // 5回連打完了したら暗転解除！
+    if (minigameTapCount <= 0) {
+        resolveHackEvent();
+    }
 }
 
 // ✅ ハック復旧（暗転解除）関数
 function resolveHackEvent() {
     isHacked = false;
     isBlackout = false;
+    
+    // 連打画面を非表示にする
+    const overlay = document.getElementById('minigame-overlay');
+    if (overlay) overlay.style.display = 'none';
+
     redrawAllHistory();
 }
 
-// ⏱️ ハック発生タイマーの開始・停止
+// ⏱️ ハック発生タイマーの開始・停止（※ここは元のままでOKです）
 function startHackLoop() {
     stopHackLoop();
-    // 8秒ごとにハックイベントが発生
     hackTimer = setInterval(() => {
         if (!isHacked && isMazeTimerRunning) {
             triggerHackEvent();
@@ -832,4 +830,3 @@ function stopHackLoop() {
     }
     resolveHackEvent();
 }
-
