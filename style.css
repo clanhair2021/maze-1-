@@ -4,9 +4,9 @@
 :root {
     /* フォント定義 */
     --font-jp: 'CLanCustomFont', sans-serif;                /* 日本語ドット絵 */
-    --font-pixel-en: 'Press Start 2P', 'VT323', monospace;   /* レトロ英数字 */
     --font-digital: 'Orbitron', monospace;                   /* スタイリッシュ数字・タイマー */
-
+    --font-pixel-en: 'Press Start 2P', 'VT323', monospace;   /* レトロ英数字 */
+   
     /* メインテーマカラー */
     --bg-color: #ffffff;
     --text-color: #000000;
