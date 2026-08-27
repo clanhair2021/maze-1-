@@ -15,19 +15,16 @@ function showPage(pageId) {
         targetPage.classList.add('active');
     }
 
-    // ゲーム画面から移動する場合はタイマーを停止
     if (pageId !== 'game-page') {
         if (typeof stopMazeTimer === 'function') stopMazeTimer();
     }
 }
 
-// メインメニュー画面へ戻る
 function backToMenu() {
     closeDrawer();
     showPage('menu-page');
     renderStageCards();
 }
-// HTML互換用エイリアス
 function goBackMenu() {
     backToMenu();
 }
@@ -37,23 +34,17 @@ function goBackMenu() {
 // --------------------------------------------------------------------------
 function openDrawer() {
     const drawer = document.getElementById('drawer-menu');
-    if (drawer) {
-        drawer.classList.add('open');
-    }
+    if (drawer) drawer.classList.add('open');
 }
 
 function closeDrawer() {
     const drawer = document.getElementById('drawer-menu');
-    if (drawer) {
-        drawer.classList.remove('open');
-    }
+    if (drawer) drawer.classList.remove('open');
 }
 
 function toggleDrawer() {
     const drawer = document.getElementById('drawer-menu');
-    if (drawer) {
-        drawer.classList.toggle('open');
-    }
+    if (drawer) drawer.classList.toggle('open');
 }
 
 // --------------------------------------------------------------------------
@@ -61,7 +52,6 @@ function toggleDrawer() {
 // --------------------------------------------------------------------------
 function toggleSettings(event) {
     if (event) event.stopPropagation();
-    // HTML側の id="settingsContent" に対応
     const content = document.getElementById('settingsContent');
     if (content) {
         content.classList.toggle('active');
@@ -69,12 +59,10 @@ function toggleSettings(event) {
     }
 }
 
-// HTMLの onclick="toggleSettingsMenu()" 互換
 function toggleSettingsMenu(event) {
     toggleSettings(event);
 }
 
-// ドロップダウンメニュー外クリックで閉じる処理
 window.addEventListener('click', (e) => {
     const content = document.getElementById('settingsContent');
     const trigger = document.querySelector('.settings-trigger');
@@ -86,7 +74,6 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// HTMLの onclick="openAdmin('imageMode')" 用の受ける関数
 function openAdmin(mode) {
     showPage('game-page');
     openDrawer();
@@ -123,31 +110,21 @@ function setAdminMode(isAdmin) {
         if (btnAdmin) btnAdmin.classList.remove('selected');
     }
     
-    // キャンバス再描画
     if (typeof redrawAllHistory === 'function') {
         redrawAllHistory();
     }
 }
 
 // --------------------------------------------------------------------------
-// 5. ステージ選択カードの動的描画 (3列グリッド対応)
+// 5. PRESET_STAGES に対応したステージ選択カードの動的描画
 // --------------------------------------------------------------------------
 function renderStageCards() {
-    // HTML側が class="stage-container" のため両対応
     const container = document.getElementById('stage-container') || document.querySelector('.stage-container');
     if (!container) return;
 
     container.innerHTML = '';
 
-    // stagesが未定義または空の場合の安全保護
-    const stageList = (typeof stages !== 'undefined' && stages.length > 0) ? stages : [
-        {
-            id: 1,
-            title: "STAGE 1: 初級迷路",
-            imageSrc: "",
-            isCalculated: false
-        }
-    ];
+    const stageList = (typeof stages !== 'undefined' && stages.length > 0) ? stages : [];
 
     stageList.forEach((stage, index) => {
         const card = document.createElement('div');
@@ -157,9 +134,13 @@ function renderStageCards() {
         const imgBox = document.createElement('div');
         imgBox.className = 'stage-image-box';
 
-        if (stage.imageSrc) {
+        // imageSrc または image の両方のプロパティに対応
+        const imgSrc = stage.imageSrc || stage.image;
+        const stageNum = stage.id || stage.number || (index + 1);
+
+        if (imgSrc) {
             const img = document.createElement('img');
-            img.src = stage.imageSrc;
+            img.src = imgSrc;
             img.style.width = '100%';
             img.style.height = '100%';
             img.style.objectFit = 'contain';
@@ -167,14 +148,14 @@ function renderStageCards() {
         } else {
             const placeholder = document.createElement('div');
             placeholder.className = 'image-placeholder';
-            placeholder.innerText = `STAGE ${stage.id}`;
+            placeholder.innerText = `STAGE ${stageNum}`;
             imgBox.appendChild(placeholder);
         }
 
         const info = document.createElement('div');
         info.className = 'stage-info';
         info.innerHTML = `
-            <div class="stage-number">STAGE 0${stage.id}</div>
+            <div class="stage-number">STAGE 0${stageNum}</div>
             <div class="stage-title">${stage.title}</div>
         `;
 
@@ -184,24 +165,20 @@ function renderStageCards() {
     });
 }
 
-// ステージ選択時の処理
+// ステージ選択時の処理（問題画像と正解画像のロード）
 function selectStage(index) {
     currentStageIndex = index;
     const stageList = (typeof stages !== 'undefined') ? stages : [];
     const selectedStage = stageList[index];
 
-    if (selectedStage && selectedStage.imageSrc) {
-        if (typeof loadMazeImage === 'function') {
-            loadMazeImage(selectedStage.imageSrc);
+    if (selectedStage) {
+        const imgSrc = selectedStage.imageSrc || selectedStage.image;
+        const ansSrc = selectedStage.answerImageSrc || selectedStage.answerImage;
+
+        if (imgSrc && typeof loadMazeImage === 'function') {
+            // 画像ロード処理の呼び出し
+            loadMazeImage(imgSrc, ansSrc);
         }
-    } else {
-        // 画像未登録時のデフォルト初期化
-        if (typeof currentMazeImageSrc !== 'undefined') currentMazeImageSrc = null;
-        const mazeBg = document.getElementById('maze-bg');
-        const setupStatus = document.getElementById('setup-status');
-        if (mazeBg) mazeBg.style.display = 'none';
-        if (setupStatus) setupStatus.innerText = 'ステータス: 画像未設定';
-        if (typeof resetCanvasState === 'function') resetCanvasState();
     }
 
     showPage('game-page');
