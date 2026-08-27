@@ -1,0 +1,73 @@
+/* ==========================================================================
+   美容室CLan 迷路ゲーム - admin.css
+   【役割】管理者用コントロールパネル・画像アップロード設定ゾーンのスタイル
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. 管理者コントロール全体の配置リセット
+   -------------------------------------------------------------------------- */
+/* 🛠️ ドロワー内に移植したため、古い下部固定の設定を完全に打ち消す */
+#admin-controls {
+    position: static;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    background: none;
+    border: none;
+    padding: 0;
+    z-index: auto;
+}
+
+/* --------------------------------------------------------------------------
+   2. 画像選択・入力フォームエリア
+   -------------------------------------------------------------------------- */
+/* ファイル選択周りの見た目をスマートに */
+.admin-input-group {
+    margin-bottom: 15px;
+}
+.admin-input-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.admin-input-group input[type="file"] {
+    width: 100%;
+    font-size: 11px;
+    font-family: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   3. 管理者設定枠（セットアップゾーン）
+   -------------------------------------------------------------------------- */
+/* 管理者用の設定ゾーン */
+.setup-zone { 
+    border: 1px dashed #000; 
+    padding: 10px; 
+    margin: 15px 0; 
+    background: #fafafa; 
+}
+#setup-status {
+    display: block;
+    font-size: 11px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+.admin-sub { 
+    font-size: 11px; 
+    padding: 6px; 
+    background: #ffffff; 
+    width: 100%;
+    margin-top: 5px;
+    text-align: center;
+}
+.admin-save { 
+    background: #000000; 
+    color: #ffffff; 
+    width: 100%; 
+    margin-top: 10px; 
+    padding: 12px; 
+    font-size: 13px;
+}
+
