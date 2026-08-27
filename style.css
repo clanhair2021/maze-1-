@@ -505,7 +505,7 @@ input[type="text"]:focus {
 #minigame-overlay .ruby-text { display: inline-block; font-size: 10px; color: #ffd700; background: rgba(255, 215, 0, 0.15); padding: 0 4px; margin-left: 6px; border-left: 2px solid #ffd700; }
 #minigame-overlay .fake-code { color: #ff00ff; font-weight: bold; background: rgba(255,0,255,0.15); padding: 4px; margin: 6px 0; display: flex; align-items: center; } 
 #minigame-overlay .fake-code label { margin-left: 6px; color: #fff; cursor: pointer; }
-#minigame-overlay .fix-select { background: #222; color: #00ff00; border: 1px solid #00ff00; font-size: 11px; padding: 2px 4px; font-family: monospace; font-weight: bold; }
+#minigame-overlay .fix-select { background: #222; color: #00ff00; border: 1px solid #00ff00; font-size: 11px; padding: 2px 4px; font-family: var(--font-pixel-en); font-weight: bold; }
 #minigame-overlay .action-btn-group { display: flex; gap: 8px; margin-top: 12px; }
 #minigame-overlay .scan-btn { background: #00aaff; color: #000; border: 2px solid #00aaff; padding: 10px; font-size: 12px; font-weight: bold; cursor: pointer; flex: 1; text-align: center; }
 #minigame-overlay .minigame-btn { background: #fff; color: #000; border: 2px solid #fff; padding: 10px; font-size: 12px; font-weight: bold; cursor: pointer; flex: 1.5; text-align: center; }
