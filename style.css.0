@@ -440,3 +440,78 @@ button:hover {
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* ほんのり影をつける */
 }
+/* ==========================================
+   🔧 追加・修正が必要なスタイル補正
+   ========================================== */
+
+/* 1. ドロワーメニュー内の「選択中」状態（ボタン） */
+.drawer-btn.selected {
+    background: #000000;
+    color: #ffffff;
+}
+
+/* 2. ミニゲーム内のコード選択ボックス（視認性と操作性の向上） */
+#minigame-overlay select.fix-select {
+    background: #000000;
+    color: #00ffcc;
+    border: 1px solid #00ffcc;
+    padding: 2px 6px;
+    font-family: var(--font-pixel-en), monospace;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+}
+#minigame-overlay select.fix-select option {
+    background: #111111;
+    color: #ffffff;
+}
+
+/* 3. ボタン選択時（描画/拡大）のビジュアルフィードバック */
+.mode-btn.selected {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* 4. アラートや入力フォームのフォーカス表示補正 */
+input[type="text"]:focus {
+    outline: 2px solid #000000;
+}
+/* ミニゲーム全体の背景オーバーレイ（画面中央寄せ & 最前面表示） */
+#minigame-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: none; /* JSで表示時に 'flex' に変更 */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+#minigame-overlay .box { border: 2px solid #fff; padding: 20px; max-width: 620px; width: 100%; background: #111; text-align: left; position: relative; overflow: hidden; box-sizing: border-box; }
+#minigame-overlay h2 { font-size: 15px; margin: 0 0 6px 0; color: #ff5555; text-align: center; }
+#minigame-overlay p { font-size: 11px; margin: 0 0 8px 0; color: #ccc; text-align: center; }
+#minigame-overlay #timer-display-patch { font-size: 15px; color: #ffcc00; text-align: center; font-weight: bold; margin-bottom: 10px; }
+#minigame-overlay .code-container { max-height: 340px; overflow-y: auto; border: 1px solid #444; padding: 12px; background: #0a0a0a; font-size: 11px; line-height: 1.8; color: #aaa; position: relative; }
+#minigame-overlay .code-line { margin: 2px 0; white-space: pre; }
+#minigame-overlay .comment { color: #6a9955; }
+#minigame-overlay .keyword { color: #569cd6; }
+#minigame-overlay .var-name { color: #9cdcfe; }
+#minigame-overlay .locked { color: #ff6666; font-style: italic; }
+#minigame-overlay .val { color: #b5cea8; }
+#minigame-overlay .ruby-text { display: inline-block; font-size: 10px; color: #ffd700; background: rgba(255, 215, 0, 0.15); padding: 0 4px; margin-left: 6px; border-left: 2px solid #ffd700; }
+#minigame-overlay .fake-code { color: #ff00ff; font-weight: bold; background: rgba(255,0,255,0.15); padding: 4px; margin: 6px 0; display: flex; align-items: center; } 
+#minigame-overlay .fake-code label { margin-left: 6px; color: #fff; cursor: pointer; }
+#minigame-overlay .fix-select { background: #222; color: #00ff00; border: 1px solid #00ff00; font-size: 11px; padding: 2px 4px; font-family: monospace; font-weight: bold; }
+#minigame-overlay .action-btn-group { display: flex; gap: 8px; margin-top: 12px; }
+#minigame-overlay .scan-btn { background: #00aaff; color: #000; border: 2px solid #00aaff; padding: 10px; font-size: 12px; font-weight: bold; cursor: pointer; flex: 1; text-align: center; }
+#minigame-overlay .minigame-btn { background: #fff; color: #000; border: 2px solid #fff; padding: 10px; font-size: 12px; font-weight: bold; cursor: pointer; flex: 1.5; text-align: center; }
+#minigame-overlay .noise-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.3) 3px, transparent 3px, transparent 6px); pointer-events: none; animation: glitch 0.15s infinite; display: none; z-index: 5; }
+@keyframes glitch {
+    0% { opacity: 0.9; transform: translateY(0); } 
+    50% { opacity: 0.4; transform: translateY(-2px); } 
+    100% { opacity: 1.0; transform: translateY(2px); } 
+}
