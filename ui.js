@@ -17,7 +17,7 @@ function showPage(pageId) {
 
     // ゲーム画面から移動する場合はタイマーを停止
     if (pageId !== 'game-page') {
-        stopMazeTimer();
+        if (typeof stopMazeTimer === 'function') stopMazeTimer();
     }
 }
 
@@ -26,6 +26,10 @@ function backToMenu() {
     closeDrawer();
     showPage('menu-page');
     renderStageCards();
+}
+// HTML互換用エイリアス
+function goBackMenu() {
+    backToMenu();
 }
 
 // --------------------------------------------------------------------------
@@ -55,24 +59,50 @@ function toggleDrawer() {
 // --------------------------------------------------------------------------
 // 3. 設定メニュー（右上ドロップダウン）制御
 // --------------------------------------------------------------------------
-function toggleSettingsMenu(event) {
+function toggleSettings(event) {
     if (event) event.stopPropagation();
-    const content = document.getElementById('settings-content');
+    // HTML側の id="settingsContent" に対応
+    const content = document.getElementById('settingsContent');
     if (content) {
+        content.classList.toggle('active');
         content.classList.toggle('open');
     }
 }
 
+// HTMLの onclick="toggleSettingsMenu()" 互換
+function toggleSettingsMenu(event) {
+    toggleSettings(event);
+}
+
 // ドロップダウンメニュー外クリックで閉じる処理
 window.addEventListener('click', (e) => {
-    const content = document.getElementById('settings-content');
+    const content = document.getElementById('settingsContent');
     const trigger = document.querySelector('.settings-trigger');
-    if (content && content.classList.contains('open')) {
+    if (content && (content.classList.contains('active') || content.classList.contains('open'))) {
         if (!content.contains(e.target) && e.target !== trigger) {
+            content.classList.remove('active');
             content.classList.remove('open');
         }
     }
 });
+
+// HTMLの onclick="openAdmin('imageMode')" 用の受ける関数
+function openAdmin(mode) {
+    showPage('game-page');
+    openDrawer();
+    setAdminMode(true);
+    
+    const ctrlImage = document.getElementById('ctrl-image-mode');
+    const ctrlTrace = document.getElementById('ctrl-trace-mode');
+    
+    if (mode === 'imageMode') {
+        if (ctrlImage) ctrlImage.style.display = 'block';
+        if (ctrlTrace) ctrlTrace.style.display = 'none';
+    } else if (mode === 'traceMode') {
+        if (ctrlImage) ctrlImage.style.display = 'none';
+        if (ctrlTrace) ctrlTrace.style.display = 'block';
+    }
+}
 
 // --------------------------------------------------------------------------
 // 4. 管理者モード・ゲームモード切替 UI
@@ -103,12 +133,23 @@ function setAdminMode(isAdmin) {
 // 5. ステージ選択カードの動的描画 (3列グリッド対応)
 // --------------------------------------------------------------------------
 function renderStageCards() {
-    const container = document.getElementById('stage-container');
+    // HTML側が class="stage-container" のため両対応
+    const container = document.getElementById('stage-container') || document.querySelector('.stage-container');
     if (!container) return;
 
     container.innerHTML = '';
 
-    stages.forEach((stage, index) => {
+    // stagesが未定義または空の場合の安全保護
+    const stageList = (typeof stages !== 'undefined' && stages.length > 0) ? stages : [
+        {
+            id: 1,
+            title: "STAGE 1: 初級迷路",
+            imageSrc: "",
+            isCalculated: false
+        }
+    ];
+
+    stageList.forEach((stage, index) => {
         const card = document.createElement('div');
         card.className = 'stage-card';
         card.onclick = () => selectStage(index);
@@ -146,17 +187,23 @@ function renderStageCards() {
 // ステージ選択時の処理
 function selectStage(index) {
     currentStageIndex = index;
-    const selectedStage = stages[index];
+    const stageList = (typeof stages !== 'undefined') ? stages : [];
+    const selectedStage = stageList[index];
 
-    if (selectedStage.imageSrc) {
-        loadMazeImage(selectedStage.imageSrc);
+    if (selectedStage && selectedStage.imageSrc) {
+        if (typeof loadMazeImage === 'function') {
+            loadMazeImage(selectedStage.imageSrc);
+        }
     } else {
         // 画像未登録時のデフォルト初期化
-        currentMazeImageSrc = null;
+        if (typeof currentMazeImageSrc !== 'undefined') currentMazeImageSrc = null;
+        const mazeBg = document.getElementById('maze-bg');
+        const setupStatus = document.getElementById('setup-status');
         if (mazeBg) mazeBg.style.display = 'none';
         if (setupStatus) setupStatus.innerText = 'ステータス: 画像未設定';
-        resetCanvasState();
+        if (typeof resetCanvasState === 'function') resetCanvasState();
     }
 
     showPage('game-page');
 }
+
