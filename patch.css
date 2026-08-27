@@ -1,0 +1,143 @@
+/* ==========================================================================
+   美容室CLan 迷路ゲーム - patch.css
+   【役割】VS Code風コード解析・パッチ適用ミニゲーム画面のスタイル
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. モーダルオーバーレイ（ミニゲーム画面の背景）
+   -------------------------------------------------------------------------- */
+#minigame-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 1000;
+    display: none; /* JSのトリガーで flex に切り替え */
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+/* --------------------------------------------------------------------------
+   2. エディタ風ウィンドウコンテナ
+   -------------------------------------------------------------------------- */
+.patch-window {
+    width: 90%;
+    max-width: 520px;
+    background: #1e1e1e;
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+    color: #d4d4d4;
+    padding: 16px;
+    text-align: left;
+    position: relative;
+    font-family: var(--font-pixel-en);
+}
+
+.patch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333333;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.patch-title {
+    color: var(--color-primary);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#timer-display-patch {
+    color: var(--color-secondary);
+    font-weight: bold;
+    font-size: 13px;
+}
+
+/* --------------------------------------------------------------------------
+   3. コード表示エリア (VS Code風)
+   -------------------------------------------------------------------------- */
+.code-container {
+    background: var(--color-code-bg, #0a0a0a);
+    border: 1px solid #333333;
+    padding: 12px;
+    font-size: 12px;
+    line-height: 1.8;
+    max-height: 320px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.code-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+/* シンタックスハイライト */
+.code-line .keyword { color: #569cd6; font-weight: bold; }
+.code-line .var-name { color: #9cdcfe; }
+.code-line .val { color: #b5cea8; }
+.code-line .comment { color: #6a9955; font-style: italic; }
+
+/* バグコード・解説ルビ表示 */
+.fake-code {
+    background: rgba(255, 0, 85, 0.15);
+    border-left: 3px solid var(--color-secondary);
+    padding: 2px 6px;
+}
+
+.ruby-text {
+    color: var(--color-accent);
+    font-size: 10px;
+    margin-left: 6px;
+}
+
+/* 選択ボックス (プルダウン) */
+.fix-select {
+    background: #252526;
+    color: #ffffff;
+    border: 1px solid var(--color-primary);
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   4. ボタンアクションエリア
+   -------------------------------------------------------------------------- */
+.patch-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-scan {
+    flex: 1;
+    background: #333333;
+    color: #ffffff;
+    border: 1px solid #666666;
+    padding: 10px;
+    font-size: 12px;
+}
+
+.btn-scan:hover {
+    background: #444444;
+}
+
+.btn-execute {
+    flex: 1;
+    background: var(--color-primary);
+    color: #000000;
+    border: none;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.btn-execute:hover {
+    background: #00cca3;
+}
