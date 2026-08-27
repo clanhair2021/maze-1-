@@ -518,24 +518,35 @@ input[type="text"]:focus {
 #minigame-overlay .fake-code { color: #ff00ff; font-weight: bold; background: rgba(255,0,255,0.15); padding: 4px; margin: 6px 0; display: flex; align-items: center; } 
 #minigame-overlay .fake-code label { margin-left: 6px; color: #fff; cursor: pointer; }
 
-/* ⭕ コード選択ボックス（1つに統合 & フォントを強固に指定） */
+/* ==========================================
+   ⭕ コード選択ボックス（最優先でフォントを強制適用）
+   ========================================== */
+#minigame-overlay select,
+#minigame-overlay .fix-select,
 #minigame-overlay select.fix-select,
-#minigame-overlay .fix-select {
-    background: #000000;
-    color: #00ffcc;
-    border: 1px solid #00ffcc;
-    padding: 2px 6px;
-    font-family: var(--font-pixel-en) !important;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    outline: none;
+#code-box select {
+    background: #000000 !important;
+    color: #00ffcc !important;
+    border: 1px solid #00ffcc !important;
+    padding: 2px 6px !important;
+    font-family: var(--font-pixel-en), monospace !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    outline: none !important;
+    -webkit-appearance: none; /* OS固有のスタイルを解除 */
+    -moz-appearance: none;
+    appearance: none;
 }
-#minigame-overlay select.fix-select option {
-    background: #111111;
-    color: #ffffff;
-    font-family: var(--font-pixel-en) !important;
+
+#minigame-overlay select option,
+#minigame-overlay .fix-select option,
+#code-box select option {
+    background: #111111 !important;
+    color: #ffffff !important;
+    font-family: var(--font-pixel-en), monospace !important;
 }
+
 
 /* ボタン類 & エフェクト */
 #minigame-overlay .action-btn-group { display: flex; gap: 8px; margin-top: 12px; }
