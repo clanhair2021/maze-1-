@@ -16,12 +16,6 @@
     --color-accent: #ffd700;        /* ハイライト（ゴールド） */
 }
 
-/* 数字タイマー専用フォントの設定 */
-#timer-display {
-    font-family: 'Orbitron', monospace;
-    letter-spacing: 2px;
-}
-
 /* VS Code風コード表示エリアのフォント */
 .code-container, .fix-select {
     font-family: var(--font-pixel-en);
