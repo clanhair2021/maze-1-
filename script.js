@@ -50,6 +50,30 @@ let isHackModeEnabled = true; // 👈 追記：ハックモード（暗転・ス
 
 
 
+// 🎮 難易度設定フラグ
+let currentDifficulty = 'NORMAL';
+
+const DIFFICULTY_SETTINGS = {
+    EASY:     { useLight: false, radius: 150, hasHack: false, needScan: false },
+    NORMAL:   { useLight: true,  radius: 150, hasHack: false, needScan: false },
+    HARD:     { useLight: true,  radius: 150, hasHack: true,  needScan: false },
+    EXPERT:   { useLight: true,  radius: 150, hasHack: true,  needScan: true },
+    SECRET:   { useLight: true,  radius: 50,  hasHack: true,  needScan: true }
+};
+
+// 難易度を選択する関数
+function setDifficulty(diff) {
+    currentDifficulty = diff;
+    const settings = DIFFICULTY_SETTINGS[diff];
+    
+    isHackModeEnabled = settings.hasHack;
+    lightRadius = settings.radius;
+    
+    // UIのボタン選択状態の更新
+    document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+    const selectedBtn = document.getElementById(`btn-diff-${diff.toLowerCase()}`);
+    if (selectedBtn) selectedBtn.classList.add('active');
+}
 
 /* ==========================================
    📦 プリセット（最初から入っている）ステージデータ
