@@ -514,32 +514,6 @@ input[type="text"]:focus {
 /* ==========================================
    ⭕ コード選択ボックス（最優先でフォントを強制適用）
    ========================================== */
-#minigame-overlay select,
-#minigame-overlay .fix-select,
-#minigame-overlay select.fix-select,
-#code-box select {
-    background: #000000 !important;
-    color: #00ffcc !important;
-    border: 1px solid #00ffcc !important;
-    padding: 2px 6px !important;
-    font-family: var(--font-pixel-en), monospace !important;
-    font-size: 12px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    outline: none !important;
-    -webkit-appearance: none; /* OS固有のスタイルを解除 */
-    -moz-appearance: none;
-    appearance: none;
-}
-
-#minigame-overlay select option,
-#minigame-overlay .fix-select option,
-#code-box select option {
-    background: #111111 !important;
-    color: #ffffff !important;
-    font-family: 'Press Start 2P', 'VT323', monospace monospace !important;
-}
-
 
 /* ボタン類 & エフェクト */
 #minigame-overlay .action-btn-group { display: flex; gap: 8px; margin-top: 12px; }
@@ -551,4 +525,94 @@ input[type="text"]:focus {
     0% { opacity: 0.9; transform: translateY(0); } 
     50% { opacity: 0.4; transform: translateY(-2px); } 
     100% { opacity: 1.0; transform: translateY(2px); } 
+}
+/* ==========================================
+   🔲 ポップアップダイヤル専用スタイル（ドット絵100%維持）
+   ========================================== */
+
+/* 値ボタンのデザイン */
+#minigame-overlay .val-dial-btn {
+    background: #000000;
+    color: #00ffcc;
+    border: 1px dashed #00ffcc;
+    padding: 2px 8px;
+    font-family: 'Press Start 2P', 'VT323', monospace !important;
+    font-size: 11px !important;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+    user-select: none;
+}
+
+#minigame-overlay .val-dial-btn:hover {
+    background: #00ffcc;
+    color: #000000;
+}
+
+/* ポップアップオーバーレイ */
+.dial-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 10000;
+}
+
+.dial-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ダイヤル本体のボックス */
+.dial-modal-content {
+    background: #111111;
+    border: 2px solid #00ffcc;
+    padding: 20px;
+    text-align: center;
+    width: 260px;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+    transform: scale(0.85);
+    transition: transform 0.15s ease;
+}
+
+.dial-modal-overlay.active .dial-modal-content {
+    transform: scale(1);
+}
+
+.dial-modal-title {
+    color: #00ffcc;
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 10px;
+    margin-bottom: 15px;
+}
+
+/* 2列グリッド配置 */
+.dial-option-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+/* ダイヤル内の選択肢ボタン */
+.dial-option-btn {
+    background: #000000;
+    color: #ffffff;
+    border: 1px solid #00ffcc;
+    padding: 12px;
+    font-family: 'Press Start 2P', 'VT323', monospace !important;
+    font-size: 12px !important;
+    cursor: pointer;
+}
+
+.dial-option-btn:active {
+    background: #00ffcc;
+    color: #000000;
 }
