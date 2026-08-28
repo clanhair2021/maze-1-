@@ -769,11 +769,21 @@ function checkAnswerTrace() {
 /* ==========================================
    🚨 リアルプログラムパッチ・攻防ミニゲーム用変数・関数
    ========================================== */
+// 👈 1. ゲーム状態保持用変数の初期宣言
+let gameState = {
+    patchValues: {
+        isBlackout: 'true',
+        valA: 1,
+        valB: 1
+    }
+};
+
 let patchTimeLeft = 45.0;
 let patchTimerInterval = null;
 let hasNoiseInCurrentSession = false;
 let isScanned = false;
 let targetCalcValue = 6;
+let currentDialTarget = null;
 
 // 🚨 ハック（障害）発生関数（パッチ適用ミニゲーム起動）
 function triggerHackEvent() {
@@ -791,6 +801,9 @@ function triggerHackEvent() {
 function openPatchMinigame() {
     isScanned = false;
     
+    // 値を初期化
+    gameState.patchValues = { isBlackout: 'true', valA: 1, valB: 1 };
+
     const overlay = document.getElementById('minigame-overlay');
     if (overlay) {
         overlay.style.setProperty('display', 'flex', 'important');
@@ -826,48 +839,27 @@ function openPatchMinigame() {
         if (patchTimeLeft <= 0) {
             clearInterval(patchTimerInterval);
             alert("【TIME OVER】パッチ適用失敗！システムが復旧できませんでした。");
-            // 失敗時は再挑戦のためにUIを再リセットして展開
             openPatchMinigame();
         }
     }, 100);
 }
 
-// 💻 コード解析画面の描画（ポップアップダイヤル対応版）
+// 💻 コード解析画面の描画（ポップアップダイヤル・スキャン機能・ノイズ統合版）
 function renderCodeUI() {
     const codeBox = document.getElementById('code-box');
     if (!codeBox) return;
 
-    const isBlackout = gameState.patchValues.isBlackout || 'true';
-    const valA = gameState.patchValues.valA || 1;
-    const valB = gameState.patchValues.valB || 1;
+    const isBlackoutVal = gameState.patchValues.isBlackout;
+    const valA = gameState.patchValues.valA;
+    const valB = gameState.patchValues.valB;
 
-    codeBox.innerHTML = `
-        <div class="code-line comment">// --- INTRUSION DETECTED ---</div>
-        <div class="code-line locked"><span class="keyword">function</span> <span class="var-name">applyMalware</span>() {</div>
-        <div class="code-line locked">    isBlackout = <span class="val">true</span>;</div>
-        <div class="code-line locked">}</div>
-        <div class="code-line"></div>
-        <div class="code-line comment">// --- SYSTEM REPAIR MODULE ---</div>
-        <div class="code-line"><span class="keyword">function</span> <span class="var-name">applySystemPatch</span>() {</div>
-        
-        <!-- ⭕ タップでポップアップが開く値ボタン -->
-        <div class="code-line">    isBlackout = <span id="patch-blackout" class="val-dial-btn" onclick="openPatchDial('blackout')">${isBlackout}</span>;</div>
-        <div class="code-line">    <span class="keyword">let</span> valA = <span id="calc-a" class="val-dial-btn" onclick="openPatchDial('valA')">${valA}</span>;</div>
-        <div class="code-line">    <span class="keyword">let</span> valB = <span id="calc-b" class="val-dial-btn" onclick="openPatchDial('valB')">${valB}</span>;</div>
-        
-        <div class="code-line">    systemStatus = (valA + valB) * 20;</div>
-        <div class="code-line">}</div>
+    let commentHeader = isScanned ?
+        `<div class="code-line comment">// ⚠️ MALWARE DETECTED (書き換え不可)</div>` :
+        `<div class="code-line comment">// --- INTRUSION DETECTED ---</div>`;
 
-        <!-- 🔲 モーダル風ポップアップダイヤル -->
-        <div id="dial-modal" class="dial-modal-overlay" onclick="closePatchDial(event)">
-            <div class="dial-modal-content">
-                <div id="dial-modal-title" class="dial-modal-title">SELECT VALUE</div>
-                <div id="dial-option-grid" class="dial-option-grid"></div>
-            </div>
-        </div>
-    `;
-}
-
+    let activeHackScript = isScanned ?
+        `<span class="var-name">isBlackout</span> = <span class="val">true</span>; <span class="ruby-text">← 暗転障害発生源</span>` :
+        `<span class="var-name">isBlackout</span> = <span class="val">true</span>;`;
 
     let patchComment = isScanned ?
         `<div class="code-line comment">// 🛠️ 修復用パッチコード (指示通りに書き換えよ)</div>` :
@@ -880,6 +872,16 @@ function renderCodeUI() {
     const rValB = isScanned ? '<span class="ruby-text">← 回復計算値B</span>' : '';
     const rCalc = isScanned ? `<span class="ruby-text">← (valA + valB) を ${targetCalcValue} にせよ</span>` : '';
 
+    let fakeCodeHtml = '';
+    if (hasNoiseInCurrentSession) {
+        fakeCodeHtml = `
+            <div class="code-line fake-code">
+                <input type="checkbox" id="fake-code-active" checked>
+                <label for="fake-code-active">systemErrorCrash(); // ⚠️ BUG NOISE DETECTED</label>
+            </div>
+        `;
+    }
+
     codeBox.innerHTML = `
         ${commentHeader}
         <div class="code-line locked"><span class="keyword">function</span> <span class="var-name">applyMalware</span>() {</div>
@@ -891,24 +893,19 @@ function renderCodeUI() {
         <div class="code-line"></div>
         ${patchComment}
         <div class="code-line"><span class="keyword">function</span> <span class="var-name">applySystemPatch</span>() {</div>
-        <div class="code-line">    <span class="var-name">isBlackout</span> = <select id="patch-blackout" class="fix-select">
-                <option value="true">true</option>
-                <option value="false">false</option>
-            </select>; ${rBlackout}</div>
-        <div class="code-line">    <span class="keyword">let</span> <span class="var-name">valA</span> = <select id="calc-a" class="fix-select">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>; ${rValA}</div>
-        <div class="code-line">    <span class="keyword">let</span> <span class="var-name">valB</span> = <select id="calc-b" class="fix-select">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>; ${rValB}</div>
+        <div class="code-line">    <span class="var-name">isBlackout</span> = <span id="patch-blackout" class="val-dial-btn" onclick="openPatchDial('blackout')">${isBlackoutVal}</span>; ${rBlackout}</div>
+        <div class="code-line">    <span class="keyword">let</span> <span class="var-name">valA</span> = <span id="calc-a" class="val-dial-btn" onclick="openPatchDial('valA')">${valA}</span>; ${rValA}</div>
+        <div class="code-line">    <span class="keyword">let</span> <span class="var-name">valB</span> = <span id="calc-b" class="val-dial-btn" onclick="openPatchDial('valB')">${valB}</span>; ${rValB}</div>
         <div class="code-line">    <span class="var-name">systemStatus</span> = (<span class="var-name">valA</span> + <span class="var-name">valB</span>) ${multiplyOp} <span class="val">20</span>; ${rCalc}</div>
         <div class="code-line">}</div>
+
+        <!-- 🔲 モーダル風ポップアップダイヤル -->
+        <div id="dial-modal" class="dial-modal-overlay" onclick="closePatchDial(event)">
+            <div class="dial-modal-content">
+                <div id="dial-modal-title" class="dial-modal-title">SELECT VALUE</div>
+                <div id="dial-option-grid" class="dial-option-grid"></div>
+            </div>
+        </div>
     `;
 }
 
@@ -929,9 +926,10 @@ function executeLivePatch() {
         }
     }
 
-    const selectedBlackout = document.getElementById('patch-blackout').value === 'true';
-    const valA = parseInt(document.getElementById('calc-a').value, 10);
-    const valB = parseInt(document.getElementById('calc-b').value, 10);
+    // 👈 選択中の値を gameState から直接判定
+    const selectedBlackout = gameState.patchValues.isBlackout === 'true';
+    const valA = parseInt(gameState.patchValues.valA, 10);
+    const valB = parseInt(gameState.patchValues.valB, 10);
     const calcSum = valA + valB;
 
     // パッチ成功条件：isBlackout を false にし、計算値を目標値に合わせる
@@ -949,7 +947,6 @@ function resolveHackEvent() {
     isHacked = false;
     isBlackout = false;
     
-    // ミニゲーム画面を閉じる
     const overlay = document.getElementById('minigame-overlay');
     if (overlay) {
         overlay.style.display = 'none';
@@ -975,9 +972,8 @@ function stopHackLoop() {
     }
     resolveHackEvent();
 }
-let currentDialTarget = null;
 
-// ダイヤルを開く
+// 🔲 ポップアップダイヤルの制御処理
 function openPatchDial(type) {
     const modal = document.getElementById('dial-modal');
     const title = document.getElementById('dial-modal-title');
@@ -1010,7 +1006,6 @@ function openPatchDial(type) {
     modal.classList.add('active');
 }
 
-// 選択した値を画面とゲームデータに反映
 function applyDialValue(val) {
     if (currentDialTarget === 'blackout') {
         const el = document.getElementById('patch-blackout');
@@ -1030,7 +1025,6 @@ function applyDialValue(val) {
     if (modal) modal.classList.remove('active');
 }
 
-// 背景タップで閉じる
 function closePatchDial(e) {
     if (e.target.id === 'dial-modal') {
         e.target.classList.remove('active');
