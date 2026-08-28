@@ -17,7 +17,7 @@
 }
 
 /* 数字タイマー専用フォントの設定 */
-#timer-display, #timer-display-patch {
+#timer-display {
     font-family: 'Orbitron', monospace;
     letter-spacing: 2px;
 }
