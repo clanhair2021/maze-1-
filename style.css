@@ -1,9 +1,12 @@
 /* ==========================================
    🎨 テーマカラー & 共通変数設定 (:root)
    ========================================== */
+/* Google Fonts からレトロ英数フォントを読み込み */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
 :root {
     /* フォント定義 */
-    --font-jp: 'CLanCustomFont', sans-serif;                /* 日本語ドット絵 */                   /* スタイリッシュ数字・タイマー */
+    --font-jp: 'CLanCustomFont', sans-serif;                /* 日本語ドット絵 */
     --font-pixel-en: 'Press Start 2P', 'VT323', monospace;   /* レトロ英数字 */
    
     /* メインテーマカラー */
@@ -14,11 +17,6 @@
     --color-primary: #00ffcc;       /* サイバーグリーン */
     --color-secondary: #ff0055;     /* サイバーピンク */
     --color-accent: #ffd700;        /* ハイライト（ゴールド） */
-}
-
-/* VS Code風コード表示エリアのフォント */
-.code-container, .fix-select {
-    font-family: var(--font-pixel-en);
 }
 
 /* ==========================================
@@ -33,7 +31,8 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'CLanCustomFont', sans-serif;  
+    /* 英数字優先：Press Start 2Pにない日本語のみCLanCustomFontが表示されます */
+    font-family: var(--font-pixel-en), var(--font-jp);  
     border-radius: 0 !important; /* すべて角丸なし */
 }
 
@@ -42,6 +41,15 @@ body {
     color: var(--text-color); 
     overflow: hidden; /* 画面全体のスクロールを防止してブレを防ぐ */
     text-align: center;
+}
+
+/* 💻 コード表示エリア & ダイヤルボタン専用フォント指定 */
+#code-box, 
+.code-container, 
+.val-dial-btn, 
+.dial-option-btn, 
+.dial-modal-title {
+    font-family: var(--font-pixel-en) !important;
 }
 
 .page { display: none; }
@@ -53,6 +61,7 @@ body {
     height: 100vh;
     overflow-y: auto;
 }
+
 
 /* ==========================================
    ボタンの共通デザイン
