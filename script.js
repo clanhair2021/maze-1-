@@ -832,34 +832,42 @@ function openPatchMinigame() {
     }, 100);
 }
 
-// 💻 コード解析画面の動的描画
+// 💻 コード解析画面の描画（ポップアップダイヤル対応版）
 function renderCodeUI() {
     const codeBox = document.getElementById('code-box');
     if (!codeBox) return;
 
-    let activeHackScript = `<span class="var-name">isBlackout</span> = <span class="keyword">true</span>;`;
+    const isBlackout = gameState.patchValues.isBlackout || 'true';
+    const valA = gameState.patchValues.valA || 1;
+    const valB = gameState.patchValues.valB || 1;
 
-    let commentHeader = isScanned ? 
-        `<div class="code-line comment">// ⛔ 実行中のウイルス障害</div>` : 
-        `<div class="code-line comment">// --- INTRUSION DETECTED ---</div>`;
+    codeBox.innerHTML = `
+        <div class="code-line comment">// --- INTRUSION DETECTED ---</div>
+        <div class="code-line locked"><span class="keyword">function</span> <span class="var-name">applyMalware</span>() {</div>
+        <div class="code-line locked">    isBlackout = <span class="val">true</span>;</div>
+        <div class="code-line locked">}</div>
+        <div class="code-line"></div>
+        <div class="code-line comment">// --- SYSTEM REPAIR MODULE ---</div>
+        <div class="code-line"><span class="keyword">function</span> <span class="var-name">applySystemPatch</span>() {</div>
+        
+        <!-- ⭕ タップでポップアップが開く値ボタン -->
+        <div class="code-line">    isBlackout = <span id="patch-blackout" class="val-dial-btn" onclick="openPatchDial('blackout')">${isBlackout}</span>;</div>
+        <div class="code-line">    <span class="keyword">let</span> valA = <span id="calc-a" class="val-dial-btn" onclick="openPatchDial('valA')">${valA}</span>;</div>
+        <div class="code-line">    <span class="keyword">let</span> valB = <span id="calc-b" class="val-dial-btn" onclick="openPatchDial('valB')">${valB}</span>;</div>
+        
+        <div class="code-line">    systemStatus = (valA + valB) * 20;</div>
+        <div class="code-line">}</div>
 
-    let fakeCodeHtml = '';
-    if (hasNoiseInCurrentSession) {
-        if (isScanned) {
-            fakeCodeHtml = `
-                <div class="code-line fake-code">
-                    <input type="checkbox" id="fake-code-active" checked>
-                    <label for="fake-code-active">⚠️ 侵入バグ: systemErrorCrash();</label>
-                    <span class="ruby-text">← チェックを外して無効化せよ</span>
-                </div>`;
-        } else {
-            fakeCodeHtml = `
-                <div class="code-line fake-code">
-                    <input type="checkbox" id="fake-code-active" checked>
-                    <label for="fake-code-active">systemErrorCrash();</label>
-                </div>`;
-        }
-    }
+        <!-- 🔲 モーダル風ポップアップダイヤル -->
+        <div id="dial-modal" class="dial-modal-overlay" onclick="closePatchDial(event)">
+            <div class="dial-modal-content">
+                <div id="dial-modal-title" class="dial-modal-title">SELECT VALUE</div>
+                <div id="dial-option-grid" class="dial-option-grid"></div>
+            </div>
+        </div>
+    `;
+}
+
 
     let patchComment = isScanned ?
         `<div class="code-line comment">// 🛠️ 修復用パッチコード (指示通りに書き換えよ)</div>` :
