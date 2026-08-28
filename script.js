@@ -9,11 +9,6 @@ const CONFIG = {
     startTolerance: 120                      /* スタート位置判定の甘さ */
 };
 
-/* 📦 プリセットステージ設定（未設定時の初期データ） */
-const PRESET_STAGES = [
-    { number: 1, title: "ステージ 1", image: "", judgeSystem: "color", answerImage: "" }
-];
-
 /* ==========================================
    共通変数・要素定義
    ========================================== */
@@ -86,6 +81,25 @@ function setDifficulty(diff) {
     if (selectedBtn) selectedBtn.classList.add('active');
 }
 
+/* ==========================================
+   📦 プリセット（最初から入っている）ステージデータ
+   ========================================== */
+const PRESET_STAGES = [
+    {
+        number: 1,
+        title: "北海道",
+        image: "stages/stage1.jpg",            // 問題画像
+        answerImage: "stages/stage1_ans.jpg",  // 正解画像（赤・青・黄が入った画像）
+        judgeSystem: "color"
+    },
+    {
+        number: 2,
+        title: "青森県",
+        image: "stages/stage2.jpg",
+        answerImage: "stages/stage2_ans.jpg",
+        judgeSystem: "color"
+    }
+];
 
 /* ==========================================
    初期化・画像読み込みと自動フィット
