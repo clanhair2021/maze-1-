@@ -975,3 +975,64 @@ function stopHackLoop() {
     }
     resolveHackEvent();
 }
+let currentDialTarget = null;
+
+// ダイヤルを開く
+function openPatchDial(type) {
+    const modal = document.getElementById('dial-modal');
+    const title = document.getElementById('dial-modal-title');
+    const grid = document.getElementById('dial-option-grid');
+    if (!modal || !grid) return;
+    
+    grid.innerHTML = '';
+    currentDialTarget = type;
+
+    if (type === 'blackout') {
+        title.innerText = 'SET: isBlackout';
+        ['true', 'false'].forEach(val => {
+            const btn = document.createElement('button');
+            btn.className = 'dial-option-btn';
+            btn.innerText = val;
+            btn.onclick = () => applyDialValue(val);
+            grid.appendChild(btn);
+        });
+    } else {
+        title.innerText = `SET: ${type}`;
+        [1, 2, 3, 4].forEach(num => {
+            const btn = document.createElement('button');
+            btn.className = 'dial-option-btn';
+            btn.innerText = num;
+            btn.onclick = () => applyDialValue(num);
+            grid.appendChild(btn);
+        });
+    }
+
+    modal.classList.add('active');
+}
+
+// 選択した値を画面とゲームデータに反映
+function applyDialValue(val) {
+    if (currentDialTarget === 'blackout') {
+        const el = document.getElementById('patch-blackout');
+        if (el) el.innerText = val;
+        gameState.patchValues.isBlackout = val;
+    } else if (currentDialTarget === 'valA') {
+        const el = document.getElementById('calc-a');
+        if (el) el.innerText = val;
+        gameState.patchValues.valA = val;
+    } else if (currentDialTarget === 'valB') {
+        const el = document.getElementById('calc-b');
+        if (el) el.innerText = val;
+        gameState.patchValues.valB = val;
+    }
+    
+    const modal = document.getElementById('dial-modal');
+    if (modal) modal.classList.remove('active');
+}
+
+// 背景タップで閉じる
+function closePatchDial(e) {
+    if (e.target.id === 'dial-modal') {
+        e.target.classList.remove('active');
+    }
+}
