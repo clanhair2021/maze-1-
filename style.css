@@ -3,8 +3,7 @@
    ========================================== */
 :root {
     /* フォント定義 */
-    --font-jp: 'CLanCustomFont', sans-serif;                /* 日本語ドット絵 */
-    --font-digital: 'Orbitron', monospace;                   /* スタイリッシュ数字・タイマー */
+    --font-jp: 'CLanCustomFont', sans-serif;                /* 日本語ドット絵 */                   /* スタイリッシュ数字・タイマー */
     --font-pixel-en: 'Press Start 2P', 'VT323', monospace;   /* レトロ英数字 */
    
     /* メインテーマカラー */
@@ -19,7 +18,7 @@
 
 /* 数字タイマー専用フォントの設定 */
 #timer-display, #timer-display-patch {
-    font-family: var(--font-digital);
+    font-family: 'Orbitron', monospace;
     letter-spacing: 2px;
 }
 
