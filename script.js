@@ -48,7 +48,38 @@ let lightRadius = 150;      // スポットライトの半径（初期値）
 const maxRadius = 150;      // スポットライトの最大半径
 let isHackModeEnabled = true; // 👈 追記：ハックモード（暗転・スポットライト）のON/OFF
 
+/* ==========================================
+   🎮 難易度設定システム（追加）
+   ========================================== */
+let currentDifficulty = 'NORMAL';
 
+const DIFFICULTY_SETTINGS = {
+    EASY:     { useLight: false, radius: 150, hasHack: false, needScanMinigame: false },
+    NORMAL:   { useLight: true,  radius: 150, hasHack: false, needScanMinigame: false },
+    HARD:     { useLight: true,  radius: 150, hasHack: true,  needScanMinigame: false },
+    EXPERT:   { useLight: true,  radius: 150, hasHack: true,  needScanMinigame: true },
+    SECRET:   { useLight: true,  radius: 40,  hasHack: true,  needScanMinigame: true }
+};
+
+let mapOpacity = 1.0;
+let currentBugType = 'TYPE_A';
+
+// 難易度切り替え関数
+function setDifficulty(diff) {
+    currentDifficulty = diff;
+    const settings = DIFFICULTY_SETTINGS[diff];
+    
+    if (typeof isHackModeEnabled !== 'undefined') {
+        isHackModeEnabled = settings.hasHack;
+    }
+    if (typeof lightRadius !== 'undefined') {
+        lightRadius = settings.radius;
+    }
+    
+    document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+    const selectedBtn = document.getElementById(`btn-diff-${diff.toLowerCase()}`);
+    if (selectedBtn) selectedBtn.classList.add('active');
+}
 
 
 /* ==========================================
