@@ -33,7 +33,6 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'CLanCustomFont', sans-serif;
     border-radius: 0 !important; /* すべて角丸なし */
 }
 
@@ -523,7 +522,7 @@ input[type="text"]:focus {
     border: 1px solid #00ffcc !important;
     padding: 2px 6px !important;
     font-family: var(--font-pixel-en), monospace !important;
-    font-size: 6px !important;
+    font-size: 12px !important;
     font-weight: bold !important;
     cursor: pointer !important;
     outline: none !important;
