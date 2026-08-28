@@ -616,3 +616,47 @@ input[type="text"]:focus {
     background: #00ffcc;
     color: #000000;
 }
+/* 🎮 難易度選択UI */
+.difficulty-selection {
+    max-width: 480px;
+    margin: 0 auto 20px auto;
+    padding: 10px;
+    border: var(--border-style);
+    background: #fafafa;
+}
+
+.diff-title {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.diff-btn-group {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.diff-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    border: 1px solid #000;
+    background: #fff;
+    cursor: pointer;
+}
+
+.diff-btn.active {
+    background: #000;
+    color: #fff;
+}
+
+/* シークレットボタン */
+.diff-btn.secret-btn {
+    border: 1px dashed #ff0055;
+    color: #ff0055;
+}
+.diff-btn.secret-btn.active {
+    background: #ff0055;
+    color: #fff;
+}
