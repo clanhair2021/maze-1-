@@ -33,6 +33,18 @@
                 </div>
             </div>
         </header>
+        
+        <!-- メインメニュー内のステージ選択UIの上に追加 -->
+        <div class="difficulty-selection">
+            <div class="diff-title">DIFFICULTY SELECT</div>
+            <div class="diff-btn-group">
+                <button id="btn-diff-easy" class="diff-btn" onclick="setDifficulty('EASY')">EASY</button>
+                <button id="btn-diff-normal" class="diff-btn active" onclick="setDifficulty('NORMAL')">NORMAL</button>
+                <button id="btn-diff-hard" class="diff-btn" onclick="setDifficulty('HARD')">HARD</button>
+                <button id="btn-diff-expert" class="diff-btn" onclick="setDifficulty('EXPERT')">EXPERT</button>
+                <button id="btn-diff-secret" class="diff-btn secret-btn" onclick="setDifficulty('SECRET')">???</button>
+            </div>
+        </div>
 
         <main class="stage-container">
       
