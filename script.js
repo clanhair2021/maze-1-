@@ -9,6 +9,11 @@ const CONFIG = {
     startTolerance: 120                      /* スタート位置判定の甘さ */
 };
 
+/* 📦 プリセットステージ設定（未設定時の初期データ） */
+const PRESET_STAGES = [
+    { number: 1, title: "ステージ 1", image: "", judgeSystem: "color", answerImage: "" }
+];
+
 /* ==========================================
    共通変数・要素定義
    ========================================== */
