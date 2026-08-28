@@ -536,7 +536,7 @@ input[type="text"]:focus {
 #code-box select option {
     background: #111111 !important;
     color: #ffffff !important;
-    font-family: var(--font-pixel-en), monospace !important;
+    font-family: 'Press Start 2P', 'VT323', monospace monospace !important;
 }
 
 
