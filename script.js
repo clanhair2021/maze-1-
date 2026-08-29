@@ -61,7 +61,6 @@ const DIFFICULTY_SETTINGS = {
     SECRET:   { useLight: true,  radius: 40,  hasHack: true,  needScanMinigame: true }
 };
 
-let mapOpacity = 1.0;
 let currentBugType = 'TYPE_A';
 let mapOpacity = 1.0; // 迷路の不透明度（TYPE_C用）
 
