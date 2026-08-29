@@ -845,8 +845,14 @@ function triggerHackEvent() {
 function openPatchMinigame() {
     isScanned = false;
     
-    // 値を初期化
-    gameState.patchValues = { isBlackout: 'true', valA: 1, valB: 1 };
+    // 👈 バグタイプに応じて初期値を正しく分岐設定する
+    gameState.patchValues = { 
+        isBlackout: currentBugType === 'TYPE_A' ? 'true' : 'false',
+        lightRadius: currentBugType === 'TYPE_B' ? 30 : 150,
+        mapOpacity: currentBugType === 'TYPE_C' ? 0.0 : 1.0,
+        valA: 1, 
+        valB: 1 
+    };
 
     const overlay = document.getElementById('minigame-overlay');
     if (overlay) {
@@ -887,6 +893,7 @@ function openPatchMinigame() {
         }
     }, 100);
 }
+
 
 // 💻 コード解析画面の描画（ポップアップダイヤル・スキャン機能・ノイズ統合版）
 function renderCodeUI() {
