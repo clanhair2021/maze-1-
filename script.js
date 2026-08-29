@@ -826,31 +826,17 @@ let isScanned = false;
 let targetCalcValue = 6;
 let currentDialTarget = null;
 
-// 🚨 ハック発生処理（ランダムバグ分岐）
+// 🚨 ハック（障害）発生関数（パッチ適用ミニゲーム起動）
 function triggerHackEvent() {
     if (isAdminMode || !isHackModeEnabled || hasJudged || !isMazeTimerRunning) return;
 
     isHacked = true;
-
-    // バグタイプをランダム決定
-    const bugTypes = ['TYPE_A', 'TYPE_B', 'TYPE_C'];
-    currentBugType = bugTypes[Math.floor(Math.random() * bugTypes.length)];
-
-    // 各バグの初期状態設定
-    if (currentBugType === 'TYPE_A') {
-        isBlackout = true;
-    } else if (currentBugType === 'TYPE_B') {
-        isBlackout = false;
-        lightRadius = 30; // 視界を極小に
-    } else if (currentBugType === 'TYPE_C') {
-        isBlackout = false;
-        mapOpacity = 0.0; // 迷路を消去
-    }
-
+    isBlackout = true; // 迷路画面を完全暗転
     redrawAllHistory();
+
+    // ミニゲーム画面を開く
     openPatchMinigame();
 }
-
 // 🔓 パッチ適用ミニゲーム画面の初期化＆表示
 function openPatchMinigame() {
     isScanned = false;
