@@ -977,14 +977,22 @@ function executeLivePatch() {
         }
     }
 
-    // 👈 選択中の値を gameState から直接判定
-    const selectedBlackout = gameState.patchValues.isBlackout === 'true';
     const valA = parseInt(gameState.patchValues.valA, 10);
     const valB = parseInt(gameState.patchValues.valB, 10);
     const calcSum = valA + valB;
 
-    // パッチ成功条件：isBlackout を false にし、計算値を目標値に合わせる
-    if (!selectedBlackout && calcSum === targetCalcValue) {
+    // バグタイプに応じた解除条件チェック
+    let isBugFixed = false;
+    if (currentBugType === 'TYPE_A') {
+        isBugFixed = (gameState.patchValues.isBlackout === 'false');
+    } else if (currentBugType === 'TYPE_B') {
+        isBugFixed = (parseInt(gameState.patchValues.lightRadius, 10) >= 150);
+    } else if (currentBugType === 'TYPE_C') {
+        isBugFixed = (parseFloat(gameState.patchValues.mapOpacity) >= 0.9);
+    }
+
+    // パッチ成功条件：発生しているバグが修正され、計算値が目標値と一致しているか
+    if (isBugFixed && calcSum === targetCalcValue) {
         alert("【SUCCESS】パッチが正常適用されました！システムが復旧します。");
         resolveHackEvent();
     } else {
