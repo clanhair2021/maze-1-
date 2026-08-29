@@ -1000,11 +1000,13 @@ function executeLivePatch() {
     }
 }
 
-// ✅ ハック復旧（暗転解除＆ミニゲーム終了）
+// ✅ ハック復旧（障害解除＆ミニゲーム終了）
 function resolveHackEvent() {
     clearInterval(patchTimerInterval);
     isHacked = false;
     isBlackout = false;
+    lightRadius = 150; // スポットライト全開
+    mapOpacity = 1.0;  // 迷路を全表示
     
     const overlay = document.getElementById('minigame-overlay');
     if (overlay) {
