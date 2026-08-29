@@ -63,6 +63,17 @@ const DIFFICULTY_SETTINGS = {
 
 let mapOpacity = 1.0;
 let currentBugType = 'TYPE_A';
+let mapOpacity = 1.0; // 迷路の不透明度（TYPE_C用）
+
+let gameState = {
+    patchValues: {
+        isBlackout: 'true',
+        lightRadius: 30,    // TYPE_B用（小さくなったスポット）
+        mapOpacity: 0.1,    // TYPE_C用（消えかかった迷路）
+        valA: 1,
+        valB: 1
+    }
+};
 
 // 難易度切り替え関数
 function setDifficulty(diff) {
@@ -816,15 +827,28 @@ let isScanned = false;
 let targetCalcValue = 6;
 let currentDialTarget = null;
 
-// 🚨 ハック（障害）発生関数（パッチ適用ミニゲーム起動）
+// 🚨 ハック発生処理（ランダムバグ分岐）
 function triggerHackEvent() {
     if (isAdminMode || !isHackModeEnabled || hasJudged || !isMazeTimerRunning) return;
 
     isHacked = true;
-    isBlackout = true; // 迷路画面を完全暗転
-    redrawAllHistory();
 
-    // ミニゲーム画面を開く
+    // バグタイプをランダム決定
+    const bugTypes = ['TYPE_A', 'TYPE_B', 'TYPE_C'];
+    currentBugType = bugTypes[Math.floor(Math.random() * bugTypes.length)];
+
+    // 各バグの初期状態設定
+    if (currentBugType === 'TYPE_A') {
+        isBlackout = true;
+    } else if (currentBugType === 'TYPE_B') {
+        isBlackout = false;
+        lightRadius = 30; // 視界を極小に
+    } else if (currentBugType === 'TYPE_C') {
+        isBlackout = false;
+        mapOpacity = 0.0; // 迷路を消去
+    }
+
+    redrawAllHistory();
     openPatchMinigame();
 }
 
