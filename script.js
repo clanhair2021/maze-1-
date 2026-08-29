@@ -895,12 +895,11 @@ function openPatchMinigame() {
 }
 
 
-// 💻 コード解析画面の描画（ポップアップダイヤル・スキャン機能・ノイズ統合版）
+// 💻 コード解析画面の描画
 function renderCodeUI() {
     const codeBox = document.getElementById('code-box');
     if (!codeBox) return;
 
-    const isBlackoutVal = gameState.patchValues.isBlackout;
     const valA = gameState.patchValues.valA;
     const valB = gameState.patchValues.valB;
 
@@ -908,17 +907,33 @@ function renderCodeUI() {
         `<div class="code-line comment">// ⚠️ MALWARE DETECTED (書き換え不可)</div>` :
         `<div class="code-line comment">// --- INTRUSION DETECTED ---</div>`;
 
-    let activeHackScript = isScanned ?
-        `<span class="var-name">isBlackout</span> = <span class="val">true</span>; <span class="ruby-text">← 暗転障害発生源</span>` :
-        `<span class="var-name">isBlackout</span> = <span class="val">true</span>;`;
-
     let patchComment = isScanned ?
         `<div class="code-line comment">// 🛠️ 修復用パッチコード (指示通りに書き換えよ)</div>` :
         `<div class="code-line comment">// --- SYSTEM REPAIR MODULE ---</div>`;
 
     const multiplyOp = isScanned ? '×' : '*';
 
-    const rBlackout = isScanned ? '<span class="ruby-text">← 画面消灯 (falseで解除)</span>' : '';
+    // 👈 バグタイプごとに修正すべきコード行を生成
+    let bugFixLine = '';
+    let activeHackScript = '';
+
+    if (currentBugType === 'TYPE_A') {
+        const val = gameState.patchValues.isBlackout;
+        const ruby = isScanned ? '<span class="ruby-text">← 画面消灯 (falseで解除)</span>' : '';
+        activeHackScript = `<span class="var-name">isBlackout</span> = <span class="val">true</span>;`;
+        bugFixLine = `<div class="code-line">    <span class="var-name">isBlackout</span> = <span id="patch-blackout" class="val-dial-btn" onclick="openPatchDial('blackout')">${val}</span>; ${ruby}</div>`;
+    } else if (currentBugType === 'TYPE_B') {
+        const val = gameState.patchValues.lightRadius;
+        const ruby = isScanned ? '<span class="ruby-text">← スポットライト半径 (150で復旧)</span>' : '';
+        activeHackScript = `<span class="var-name">lightRadius</span> = <span class="val">30</span>;`;
+        bugFixLine = `<div class="code-line">    <span class="var-name">lightRadius</span> = <span id="patch-light" class="val-dial-btn" onclick="openPatchDial('lightRadius')">${val}</span>; ${ruby}</div>`;
+    } else if (currentBugType === 'TYPE_C') {
+        const val = gameState.patchValues.mapOpacity;
+        const ruby = isScanned ? '<span class="ruby-text">← 迷路不透明度 (1.0で復旧)</span>' : '';
+        activeHackScript = `<span class="var-name">mapOpacity</span> = <span class="val">0.0</span>;`;
+        bugFixLine = `<div class="code-line">    <span class="var-name">mapOpacity</span> = <span id="patch-opacity" class="val-dial-btn" onclick="openPatchDial('mapOpacity')">${val}</span>; ${ruby}</div>`;
+    }
+
     const rValA = isScanned ? '<span class="ruby-text">← 回復計算値A</span>' : '';
     const rValB = isScanned ? '<span class="ruby-text">← 回復計算値B</span>' : '';
     const rCalc = isScanned ? `<span class="ruby-text">← (valA + valB) を ${targetCalcValue} にせよ</span>` : '';
@@ -944,13 +959,12 @@ function renderCodeUI() {
         <div class="code-line"></div>
         ${patchComment}
         <div class="code-line"><span class="keyword">function</span> <span class="var-name">applySystemPatch</span>() {</div>
-        <div class="code-line">    <span class="var-name">isBlackout</span> = <span id="patch-blackout" class="val-dial-btn" onclick="openPatchDial('blackout')">${isBlackoutVal}</span>; ${rBlackout}</div>
+        ${bugFixLine}
         <div class="code-line">    <span class="keyword">let</span> <span class="var-name">valA</span> = <span id="calc-a" class="val-dial-btn" onclick="openPatchDial('valA')">${valA}</span>; ${rValA}</div>
         <div class="code-line">    <span class="keyword">let</span> <span class="var-name">valB</span> = <span id="calc-b" class="val-dial-btn" onclick="openPatchDial('valB')">${valB}</span>; ${rValB}</div>
         <div class="code-line">    <span class="var-name">systemStatus</span> = (<span class="var-name">valA</span> + <span class="var-name">valB</span>) ${multiplyOp} <span class="val">20</span>; ${rCalc}</div>
         <div class="code-line">}</div>
 
-        <!-- 🔲 モーダル風ポップアップダイヤル -->
         <div id="dial-modal" class="dial-modal-overlay" onclick="closePatchDial(event)">
             <div class="dial-modal-content">
                 <div id="dial-modal-title" class="dial-modal-title">SELECT VALUE</div>
@@ -959,6 +973,7 @@ function renderCodeUI() {
         </div>
     `;
 }
+
 
 // 🔍 スキャンボタン実行
 function runCodeScan() {
