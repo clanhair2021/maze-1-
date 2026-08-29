@@ -61,18 +61,8 @@ const DIFFICULTY_SETTINGS = {
     SECRET:   { useLight: true,  radius: 40,  hasHack: true,  needScanMinigame: true }
 };
 
+let mapOpacity = 1.0;
 let currentBugType = 'TYPE_A';
-let mapOpacity = 1.0; // 迷路の不透明度（TYPE_C用）
-
-let gameState = {
-    patchValues: {
-        isBlackout: 'true',
-        lightRadius: 30,    // TYPE_B用（小さくなったスポット）
-        mapOpacity: 0.1,    // TYPE_C用（消えかかった迷路）
-        valA: 1,
-        valB: 1
-    }
-};
 
 // 難易度切り替え関数
 function setDifficulty(diff) {
