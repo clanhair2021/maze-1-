@@ -379,9 +379,10 @@ function redrawAllHistory() {
         ctx.stroke();
     }
 
-    // 5. 暗転・スポットライト処理（画面座標系で一括描画）
-    if (!isAdminMode && isHackModeEnabled) {
-        // メモリ上に暗幕用のキャンバスを作成（等倍サイズ）
+    // 5. 暗転・スポットライト処理（難易度連動）
+    const diffSetting = DIFFICULTY_SETTINGS[currentDifficulty];
+    if (!isAdminMode && diffSetting.useLight) {
+        // メモリ上に暗幕用のキャンバスを作成（等倍サイズ）       
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
